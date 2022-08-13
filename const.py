@@ -6,5 +6,10 @@ class Const:
     # Юлин бот
 	# token = "5200043035:AAGSncbDnds3FAJi0ne-DNldyy6GHSFizA8" 
 	# test_bot token
-    token = "5547290080:AAEzMdG4Q1811fTl2ToGPfG7ZbpqGyfJ4Eo"
+    # token = "5547290080:AAEzMdG4Q1811fTl2ToGPfG7ZbpqGyfJ4Eo"
+    # customerDemoBot token
+    token = "5465368188:AAG83Mpit0wwk6CPMgYw_NSQXecSH6Arkyk"
+    UKassaTestToken = "381764678:TEST:41073"
+    
+
 
