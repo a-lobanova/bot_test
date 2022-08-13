@@ -20,6 +20,13 @@ def paymentMarkup(data):
 	payment.add(item1)
 	return payment
 
+def paymentOptionsMarkup():
+	paymentOptions = InlineKeyboardMarkup(row_width=2)
+	item1 = InlineKeyboardButton("По реквизитам", callback_data = "bankDetails")
+	item2 = InlineKeyboardButton("Через ЮКассу", callback_data = "UKassa")
+	paymentOptions.add(item1, item2)
+	return paymentOptions
+
 def paymentComplitedMarkup(data):
 	paymentComplited = InlineKeyboardMarkup(row_width=1)
 	item1 = InlineKeyboardButton("Оплата за заказ получена", callback_data=data)

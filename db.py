@@ -64,6 +64,21 @@ class Database:
 		with self.connection:
 			return self.cursor.execute("UPDATE orders SET rubprice = ? WHERE order_id = ?", (value, order_id,))
 
+	def get_rubprice(self, order_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT rubprice FROM orders WHERE order_id = ?", (order_id,)).fetchall()
+			for row in result:
+				rubprice = row[0]
+			return rubprice	
+
+	def get_orderDesc(self, order_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT orderDesc FROM orders WHERE order_id = ?", (order_id,)).fetchall()
+			for row in result:
+				orderDesc = str(row[0])
+			return orderDesc	
+
+
 	def set_deliveryrubprice(self, order_id, value):
 		with self.connection:
 			return self.cursor.execute("UPDATE orders SET rubDeliveryPrice = ? WHERE order_id = ?", (value, order_id,))
