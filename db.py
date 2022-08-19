@@ -181,7 +181,7 @@ class Database:
 			result = self.cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchall()
 			answ = f" \n"
 			for r in result:
-				answ += f"Сумма - {r[7]}руб.\n"
+				answ += f"Сумма заказа - {r[7]}руб.\n"
 				answ += f"Номер заказа - {r[0]}\n"
 				answ += f"Наименование - {r[2]}\n"
 				answ += f"Дата обновления - {r[10]}\n"
@@ -196,6 +196,7 @@ class Database:
 				answ += f"Сумма доставки - {r[9]}руб.\n"
 				answ += f"Номер заказа - {r[0]}\n"
 				answ += f"Наименование - {r[2]}\n"
+				answ += f"Дата обновления - {r[10]}\n"
 			return answ
 
 	def get_lastOrder_id(self, user_id):
