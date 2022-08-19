@@ -14,6 +14,11 @@ class Database:
 			result = self.cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchall()
 			return bool(len(result))
 
+	def order_exists(self, order_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchall()
+			return bool(len(result))
+
 	def order_status_exists(self, status):
 		with self.connection:
 			result = self.cursor.execute("SELECT * FROM orders WHERE status = ?", (status,)).fetchall()
@@ -53,6 +58,21 @@ class Database:
 		with self.connection:
 			return self.cursor.execute("UPDATE orders SET status = ? WHERE order_id = ?", (status, order_id,))
 
+	def set_message_id(self, order_id, message_id):
+		with self.connection:
+			return self.cursor.execute("UPDATE orders SET message_id = ? WHERE order_id = ?", (message_id, order_id,))
+
+	def set_update(self, order_id):
+		with self.connection:
+			return self.cursor.execute("UPDATE orders SET 'upDate' = DATETIME('now') WHERE order_id = ?", (order_id,))
+
+	def get_message_id(self, order_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT message_id FROM orders WHERE order_id = ?", (order_id,)).fetchall()
+			for row in result:
+				status1 = str(row[0])
+			return status1
+
 	def get_orderStatus(self, order_id):
 		with self.connection:
 			result = self.cursor.execute("SELECT status FROM orders WHERE order_id = ?", (order_id,)).fetchall()
@@ -71,6 +91,7 @@ class Database:
 				rubprice = row[0]
 			return rubprice	
 
+
 	def get_orderDesc(self, order_id):
 		with self.connection:
 			result = self.cursor.execute("SELECT orderDesc FROM orders WHERE order_id = ?", (order_id,)).fetchall()
@@ -82,10 +103,17 @@ class Database:
 	def set_deliveryrubprice(self, order_id, value):
 		with self.connection:
 			return self.cursor.execute("UPDATE orders SET rubDeliveryPrice = ? WHERE order_id = ?", (value, order_id,))
+
+	def get_deliveryrubprice(self, order_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT rubDeliveryPrice FROM orders WHERE order_id = ?", (order_id,)).fetchall()
+			for row in result:
+				rubprice = row[0]
+			return rubprice
 	
 	def editOrder(self, order_id, text):
-		print("def editOrder")
-		print("def editOrder text", text)
+		# print("def editOrder")
+		# print("def editOrder text", text)
 		with self.connection:
 			return self.cursor.execute("UPDATE orders SET orderDesc = ? WHERE order_id = ?", (text, order_id,))
 
@@ -156,6 +184,7 @@ class Database:
 				answ += f"Сумма - {r[7]}руб.\n"
 				answ += f"Номер заказа - {r[0]}\n"
 				answ += f"Наименование - {r[2]}\n"
+				answ += f"Дата обновления - {r[10]}\n"
 			return answ
 	def get_delivery_paid_order_through_order_id(self, order_id):
 		with self.connection:

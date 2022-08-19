@@ -6,7 +6,7 @@ from aiogram.types.message import ContentTypes
 import markups as nav
 from db import Database
 from const import Const
-from yookassa import Payment
+# from yookassa import Payment
 import requests
 # from telebot import types
 
@@ -143,7 +143,7 @@ async def bot_message(message: types.Message):
                 db.set_delivery_price(order_id, message.text)
                 db.set_orderStatus(order_id, "wait delivery payment")
                 summa = round((int(message.text)) * rate)
-                await bot.send_message(user_id, "Сумма доставки " + str(summa) + " руб. По курсу Тинькофф 1EUR = " + str(rate), reply_markup = nav.deliveryPaymentMarkup(order_id))
+                await bot.send_message(user_id, "Сумма доставки " + str(summa) + " руб. По курсу Тинькофф 1EUR = " + str(rate) + "\nНомер заказа - " + str(order_id), reply_markup = nav.deliveryPaymentMarkup(order_id))
                 await bot.send_message(adminId, "Уведомление об оплате за ДОСТАВКУ отправлено пользователю: " + str(summa) + "руб.")
                 db.set_deliveryrubprice(order_id, summa)
             except Exception as e:
@@ -215,23 +215,30 @@ async def callback_inline(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "UKassa")
 async def callback_inline(call: types.CallbackQuery):
-    # print("call", call)
+    # print(" UKassa call", call)
     # order_id = orderIdFromMessege(call.message.text)
     orderId = str(orderIdFromMessege(call.message.text))
     f = filter(str.isdecimal, orderId)
     order_id = "".join(f)
     print ("order_id", order_id)
-    print ("type order_id", type(order_id))
-    amount = str(round(db.get_rubprice(order_id)))+"00"
-    amountPrice = int(amount)
-    print("get_rubprice", amountPrice)
-    print("type(amount)", type(amountPrice))
-    print("get_rubprice", amountPrice)
-    description = db.get_orderDesc(order_id)
-    print("orderDesc", description)
-    await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = "payment", provider_token = const.UKassaTestToken,
-        currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": 400000}])
-
+    if db.get_orderStatus(order_id) == "wait payment":
+        print("db.get_orderStatus(order_id) == wait payment")
+        amount = str(round(db.get_rubprice(order_id)))+"00"
+        amountPrice = int(amount)
+        description = db.get_orderDesc(order_id)
+        print("orderDesc", description)
+        await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
+            currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
+        db.set_orderStatus(order_id, "yookassaPayment")
+    elif db.get_orderStatus(order_id) == "wait delivery payment":
+        print("db.get_orderStatus(order_id) == wait delivery payment")
+        amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
+        amountPrice = int(amount)
+        description = db.get_orderDesc(order_id)
+        # print("orderDesc", description)
+        await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
+            currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
+        
 
 @dp.pre_checkout_query_handler()
 async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery):
@@ -243,23 +250,23 @@ async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery)
 
 @dp.message_handler(content_types=ContentTypes.SUCCESSFUL_PAYMENT)
 async def process_pay(message: types.Message):
-    print(types.Message)
-    print(ContentTypes.SUCCESSFUL_PAYMENT)
+    # print("message", message)
+    # print(ContentTypes.SUCCESSFUL_PAYMENT)
     # print("cancellation_details", Payment.cancellation_details)
-    if message.successful_payment.invoice_payload == "payment":
+    order_id = message.successful_payment.invoice_payload
+    print("order_id", order_id)
+    if db.order_exists(message.successful_payment.invoice_payload):
         # Уведомление об успешном платеже
+        db.set_orderStatus(order_id, "complitedPayment")
+        db.set_update(order_id) 
+        user_id = db.get_user_id_through_order_id(order_id)
+        order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
+        # order_inform_for_user = "Оплата за заказ получена \n" + db.get_paid_order_through_order_id(order_id) 
+        # remove inline buttons
+        print("db.get_message_id(order_id)", db.get_message_id(order_id))
+        await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = order_inform)
         await bot.send_message(message.from_user.id, "Платеж принят!")
-        await bot.send_message(adminId, "Оплата за товар получена")
-
-@dp.message_handler(content_types=ContentTypes.SUCCESSFUL_PAYMENT)
-async def process_pay(message: types.Message):
-    print(types.Message)
-    print(ContentTypes.SUCCESSFUL_PAYMENT)
-    # print("cancellation_details", Payment.cancellation_details)
-    if message.successful_payment.invoice_payload == "payment":
-        # Уведомление об успешном платеже
-        await bot.send_message(message.from_user.id, "Платеж принят!")
-        await bot.send_message(adminId, "Оплата за товар получена")
+        await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
 
 @dp.callback_query_handler()
 async def callback_inline(call):
@@ -270,13 +277,14 @@ async def callback_inline(call):
     try:
         if call.message:
             if call.data:
-                # print("call", call)
+                print("call", call)
                 # print("call.data", call.data)
                 if "ok" in call.data:
                     print ("Подтвердить")
                     # print("call.message", call.message)
                     # print("test", call.message.reply_markup.inline_keyboard[0][0].callback_data)
                     okOrderId = call.data.partition("ok")[2]
+                    db.set_update(okOrderId)
                     print("type(okOrderId)", type(okOrderId))
                         # remove inline buttons
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text + f'\nЗаказ подтвержден, введите сумму в евро к оплате. Курс на сегодня 1EUR = {rate} руб.',
@@ -302,18 +310,19 @@ async def callback_inline(call):
                     await bot.send_message(user_id, "Заказ отменен. Мы свяжемся с Вами лично для уточнения деталей.")
                 elif "Оплатить" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print ("Оплата")
-                    print("call.message.from_id",call.message.from_id)
+                    print("Оплата call",call)
                     paymentOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
-                    print("call.message.chat.id",call.message.chat.id)
-                    print("paymentOrderId", paymentOrderId)
-                                    # remove inline buttons
+                    # print("paymentOrderId", paymentOrderId)
+                         # remove inline buttons
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text,
                         reply_markup=nav.paymentOptionsMarkup())
-                    # await bot.send_message(call.message.chat.id, const.bank_details)
-                    # await bot.send_photo(call.message.chat.id, photo=open('static/qr.jpg', 'rb'))
                     user_id = call.message.chat.id
+                    db.set_update(paymentOrderId)
                     order_inform = "Заказ находится на стадии оплаты \n" + "Пользователь: " + db.get_nickname(user_id) + db.get_order_through_order_id(paymentOrderId) 
-                    await bot.send_message(adminId, order_inform, reply_markup = nav.paymentComplitedMarkup(paymentOrderId))
+                    msg = await bot.send_message(adminId, order_inform, reply_markup = nav.paymentComplitedMarkup(paymentOrderId))
+                    # print(msg["message_id"])
+                    db.set_message_id(paymentOrderId, msg["message_id"])
+
                 elif "Оплата за заказ получена" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print("Оплата за заказ получена")
                     paymentOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
@@ -333,7 +342,7 @@ async def callback_inline(call):
                     user_id = db.get_user_id_through_order_id(redeemedOrderId)
                     order_inform = "Заказ выкуплен \n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(redeemedOrderId) 
                     order_inform_for_user = "Заказ выкуплен \n" + db.get_paid_order_through_order_id(redeemedOrderId) + "Ожидайте уведомления о стоимости доставки\n" 
-                    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform + "\nВведите сумму доставки:",
+                    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform + "\nВведите сумму доставки в евро:",
                         reply_markup=None)
                     # await bot.send_message(adminId, order_inform)
                     db.set_orderStatus(redeemedOrderId, "orderRedeemed")
@@ -346,9 +355,9 @@ async def callback_inline(call):
                     print("call.message.chat.id",call.message.chat.id)
                     print("deliveryPaymentOrderId", deliveryPaymentOrderId)
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text,
-                        reply_markup=None)
-                    await bot.send_message(call.message.chat.id, const.bank_details)
-                    await bot.send_photo(call.message.chat.id, photo=open('static/qr.jpg', 'rb'))
+                        reply_markup=nav.paymentOptionsMarkup())
+                    # await bot.send_message(call.message.chat.id, const.bank_details)
+                    # await bot.send_photo(call.message.chat.id, photo=open('static/qr.jpg', 'rb'))
                     user_id = call.message.chat.id
                     order_inform = "Заказ на стадии оплаты доставки\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_delivery_paid_order_through_order_id(deliveryPaymentOrderId) 
                     await bot.send_message(adminId, order_inform, reply_markup = nav.deliveryPaymentComplitedMarkup(deliveryPaymentOrderId))
