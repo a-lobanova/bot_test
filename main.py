@@ -265,7 +265,7 @@ async def process_pay(message: types.Message):
             # order_inform_for_user = "Оплата за заказ получена \n" + db.get_paid_order_through_order_id(order_id) 
             # remove inline buttons
             print("db.get_message_id(order_id)", db.get_message_id(order_id))
-            await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = order_inform)
+            await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
             await bot.send_message(message.from_user.id, "Платеж принят!")
             await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
         # Уведомление об успешном платеже за Доставку 
@@ -276,7 +276,7 @@ async def process_pay(message: types.Message):
             order_inform = "Доставка оплачена через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_delivery_paid_order_through_order_id(order_id)  
             # remove inline buttons
             print("db.get_message_id(order_id)", db.get_message_id(order_id))
-            await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = order_inform)
+            await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за ДОСТАВКУ заказа #" + order_id)
             await bot.send_message(message.from_user.id, "Платеж за доставку принят!")
             await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id))
 
@@ -383,6 +383,7 @@ async def callback_inline(call):
                     sentOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
                     db.set_orderStatus(sentOrderId, "sentOrder") 
                     user_id = db.get_user_id_through_order_id(sentOrderId)
+                    db.set_update(sentOrderId)
                     order_inform = "Заказ отправлен \n" + "Пользователь: " + db.get_nickname(user_id) + db.get_delivery_paid_order_through_order_id(sentOrderId) 
                     order_inform_for_user = "Заказ отправлен \n" + db.get_delivery_paid_order_through_order_id(sentOrderId)
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform,

@@ -64,7 +64,7 @@ class Database:
 
 	def set_update(self, order_id):
 		with self.connection:
-			return self.cursor.execute("UPDATE orders SET 'upDate' = DATETIME('now') WHERE order_id = ?", (order_id,))
+			return self.cursor.execute("UPDATE orders SET 'upDate' = DATETIME('now','localtime') WHERE order_id = ?", (order_id,))
 
 	def get_message_id(self, order_id):
 		with self.connection:
