@@ -34,18 +34,29 @@ class handler(BaseHTTPRequestHandler):
         event_json = json.loads(request.body)
         message = "POST response"
         self.wfile.write(bytes(message, "utf8"))
+                # Cоздайте объект класса уведомлений в зависимости от события
+        try:
+            print("notification_object")
+            notification_object = WebhookNotification(event_json)
+        except Exception:
+            print("notification_object error")
+        # обработка ошибок
+
+        # Получите объекта платежа
+        payment = notification_object.object
+
         return HttpResponse(status=200)
 
-        # Cоздайте объект класса уведомлений в зависимости от события
-try:
-    print("notification_object")
-    notification_object = WebhookNotification(event_json)
-except Exception:
-    print("notification_object error")
-    # обработка ошибок
+#         # Cоздайте объект класса уведомлений в зависимости от события
+# try:
+#     print("notification_object")
+#     notification_object = WebhookNotification(event_json)
+# except Exception:
+#     print("notification_object error")
+#     # обработка ошибок
 
-    # Получите объекта платежа
-payment = notification_object.object
+#     # Получите объекта платежа
+# payment = notification_object.object
 
 with HTTPServer(('', 443), handler) as server:
     server.serve_forever()
