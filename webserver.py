@@ -24,14 +24,14 @@ class handler(BaseHTTPRequestHandler):
         # content = body['content']
         self.wfile.write(bytes(message, "utf8"))
 
-@app.route('/post_json', methods=['POST'])
-def process_json():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        json = request.json
-        return json
-    else:
-        return 'Content-Type not supported!'
+# @app.route('/post_json', methods=['POST'])
+    def process_json():
+        content_type = request.headers.get('Content-Type')
+        if (content_type == 'application/json'):
+            json = request.json
+            return json
+        else:
+            return 'Content-Type not supported!'
         # try:
         #     print("notification_object")
         #     notification_object = WebhookNotification(event_json)
