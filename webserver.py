@@ -31,7 +31,7 @@ class handler(BaseHTTPRequestHandler):
             print("try")
             json = request.json
             return json
-        else:
+        except:
             return print('Content-Type not supported!')
         
 
