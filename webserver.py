@@ -25,12 +25,12 @@ class handler(BaseHTTPRequestHandler):
         # body_unicode = request.body.decode('utf-8')
         # body = json.loads(body_unicode)
         # content = body['content']
-        content_type = request.headers.get('Content-Type')
-        if (content_type == 'application/json'):
-            json = request.json
-            return json
-        else:
-            return print('Content-Type not supported!')
+        # content_type = request.headers.get('Content-Type')
+        # if (content_type == 'application/json'):    
+        data = json.loads(request.data)
+        return data
+        # else:
+        #     return print('Content-Type not supported!')
         
 
 # @app.route('/post_json', methods=['POST'])
