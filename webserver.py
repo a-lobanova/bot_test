@@ -36,7 +36,7 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(message, "utf8"))
         return HttpResponse(status=200)
 
-    # Cоздайте объект класса уведомлений в зависимости от события
+        # Cоздайте объект класса уведомлений в зависимости от события
     try:
         notification_object = WebhookNotification(event_json)
     except Exception:
