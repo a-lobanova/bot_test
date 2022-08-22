@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
 
+app = Flask(__name__)
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -77,7 +79,8 @@ def process_json():
 
 # with HTTPServer(('', 443), handler) as server:
 #     server.serve_forever()
-app = Flask(__name__)
+
+
 @app.route('/')
 def index():
     return "Hello World with flask"
