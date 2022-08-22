@@ -28,7 +28,7 @@ class handler(BaseHTTPRequestHandler):
         # payment = notification_object.object
         # message2 = payment
         # self.wfile.write(bytes(message2, "utf8"))
-        
+
 def my_webhook_handler(request):
     event_json = json.loads(request.body)
     return HttpResponse(status=200)
@@ -38,6 +38,8 @@ try:
     notification_object = WebhookNotification(event_json)
 except Exception:
     # обработка ошибок
+    print(repr(e))
+    print("notification_object")
 
 # Получите объекта платежа
 payment = notification_object.object
