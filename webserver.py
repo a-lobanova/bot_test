@@ -36,7 +36,7 @@ def my_webhook_handler(request):
 # Cоздайте объект класса уведомлений в зависимости от события
 try:
     notification_object = WebhookNotification(event_json)
-except Exception:
+except Exception as e:
     # обработка ошибок
     print(repr(e))
     print("notification_object")
