@@ -28,7 +28,7 @@ class handler(BaseHTTPRequestHandler):
             json = request.json
             return json
         else:
-            return 'Content-Type not supported!'
+            return print('Content-Type not supported!')
         
 
 # @app.route('/post_json', methods=['POST'])
