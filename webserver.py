@@ -43,6 +43,7 @@ except Exception:
     print("notification_object")
     # обработка ошибок
      message = "POST response error"
+     self.wfile.write(bytes(message, "utf8"))
 
     # Получите объекта платежа
 payment = notification_object.object
