@@ -29,20 +29,20 @@ class handler(BaseHTTPRequestHandler):
         # message2 = payment
         # self.wfile.write(bytes(message2, "utf8"))
 
-def my_webhook_handler(request):
-    event_json = json.loads(request.body)
-    return HttpResponse(status=200)
+# def my_webhook_handler(request):
+#     event_json = json.loads(request.body)
+#     return HttpResponse(status=200)
 
-# Cоздайте объект класса уведомлений в зависимости от события
-try:
-    notification_object = WebhookNotification(event_json)
-except Exception as e:
-    # обработка ошибок
-    print(repr(e))
-    print("notification_object")
+# # Cоздайте объект класса уведомлений в зависимости от события
+# try:
+#     notification_object = WebhookNotification(event_json)
+# except Exception as e:
+#     # обработка ошибок
+#     print(repr(e))
+#     print("notification_object error")
 
-# Получите объекта платежа
-payment = notification_object.object
+# # Получите объекта платежа
+# payment = notification_object.object
 
 #         # Cоздайте объект класса уведомлений в зависимости от события
 # try:
