@@ -38,12 +38,11 @@ class handler(BaseHTTPRequestHandler):
 
         # Cоздайте объект класса уведомлений в зависимости от события
 try:
+    print("notification_object")
     notification_object = WebhookNotification(event_json)
 except Exception:
-    print("notification_object")
+    print("notification_object error")
     # обработка ошибок
-     message = "POST response error"
-     self.wfile.write(bytes(message, "utf8"))
 
     # Получите объекта платежа
 payment = notification_object.object
