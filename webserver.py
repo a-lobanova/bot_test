@@ -31,6 +31,8 @@ class handler(BaseHTTPRequestHandler):
 
 
     def my_webhook_handler(request):
+        self.send_header('Content-type','text/html')
+        self.end_headers()
         event_json = json.loads(request.body)
         message = "POST response"
         self.wfile.write(bytes(message, "utf8"))
