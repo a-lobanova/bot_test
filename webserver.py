@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
+from flask import Flask, request
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -17,8 +18,20 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
         message = "POST response"
-        event_json = json.loads(request.body)
+        # event_json = json.loads(request.body)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        # content = body['content']
         self.wfile.write(bytes(message, "utf8"))
+        
+@app.route('/post_json', methods=['POST'])
+    def process_json():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+        return json
+    else:
+        return 'Content-Type not supported!'
         # try:
         #     print("notification_object")
         #     notification_object = WebhookNotification(event_json)
