@@ -23,9 +23,9 @@ class handler(BaseHTTPRequestHandler):
         # body = json.loads(body_unicode)
         # content = body['content']
         self.wfile.write(bytes(message, "utf8"))
-        
+
 @app.route('/post_json', methods=['POST'])
-    def process_json():
+def process_json():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = request.json
