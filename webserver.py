@@ -21,10 +21,10 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         message = "POST response"
         self.wfile.write(bytes(message, "utf8"))
-        event_json = json.loads(request.body)
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-        content = body['content']
+        # event_json = json.loads(request.body)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        # content = body['content']
         content_type = request.headers.get('Content-Type')
         if (content_type == 'application/json'):
             json = request.json
