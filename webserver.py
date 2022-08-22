@@ -77,12 +77,12 @@ def process_json():
 #     # Получите объекта платежа
 # payment = notification_object.object
 
-# with HTTPServer(('', 443), handler) as server:
-#     server.serve_forever()
-
 
 @app.route('/')
 def index():
     return "Hello World with flask"
 if __name__ == '__webserver__':
-    app.run(port=443,debug=True)
+    app.run(port=443, debug=True)
+
+with HTTPServer(('', 443), handler) as server:
+    server.serve_forever()
