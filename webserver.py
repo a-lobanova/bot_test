@@ -49,6 +49,6 @@ def process_json():
         return json
     else:
         return 'Content-Type not supported!'
-        
-app.run(host = '10.128.0.2', port=8000, debug=True)
+
+app.run(host = '10.128.0.2', port=8000, debug=False)
 
