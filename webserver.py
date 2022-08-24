@@ -49,4 +49,4 @@ def process_json():
         return 'Content-Type not supported!'
 
 if __name__ == '__webserver__':
-    app.run(host='0.0.0.0', port=443, debug=True)
+    app.run(host='34.173.216.48', port=443, debug=True)
