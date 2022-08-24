@@ -35,9 +35,9 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-# @app.route('/')
-# def hello():
-#     return 'Hello!'
+@app.route('/')
+def hello():
+    return 'Hello!'
 
 @app.route('/post_json', methods=['POST'])
 def process_json():
@@ -49,4 +49,4 @@ def process_json():
         return 'Content-Type not supported!'
 
 if __name__ == '__ws__':
-    app.run(port=443, debug=True)
+    app.run(host='0.0.0.0', port=443, debug=True)
