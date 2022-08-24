@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import requests
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
 
@@ -49,4 +49,4 @@ def process_json():
         return 'Content-Type not supported!'
 
 if __name__ == '__webserver__':
-    app.run(port=443, debug=True)
+    app.run(host = '0.0.0.0', port=8000, debug=True)
