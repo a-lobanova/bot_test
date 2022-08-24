@@ -35,7 +35,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-app.config['SERVER_NAME'] = 'lobanva.ml'
+# app.config['SERVER_NAME'] = 'lobanva.ml'
 
 @app.route('/')
 def hello():
