@@ -7,6 +7,7 @@ from flask import Flask, request
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        print("do_GET")
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
@@ -15,6 +16,7 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(message, "utf8"))
 
     def do_POST(self):
+        print("do_POST")
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
