@@ -5,50 +5,25 @@ import requests
 from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
 
-# class handler(BaseHTTPRequestHandler):
-#     def do_GET(self):
-#         self.send_response(200)
-#         self.send_header('Content-type','text/html')
-#         self.end_headers()
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
 
-#         message = "Lobanova senior-pomidor!!!11"
-#         self.wfile.write(bytes(message, "utf8"))
+        message = "Lobanova senior-pomidor!!!11"
+        self.wfile.write(bytes(message, "utf8"))
 
-#     def do_POST(self):
-#         self.send_response(200)
-#         self.send_header('Content-type','text/html')
-#         self.end_headers()
-#         message = "POST response"
-#         self.wfile.write(bytes(message, "utf8"))
-#         content_type = request.headers.get('Content-Type')
-#         try:    
-#             print("try")
-#             json = request.json
-#             return json
-#         except:
-#             return print('Content-Type not supported!')
-        
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+        length = int(self.headers.get('content-length'))
+        message = json.loads(self.rfile.read(length))
+        self.wfile.write(bytes(json.dumps(message), "utf8"))
+        print (message)        
 
-# with HTTPServer(('', 443), handler) as server:
-#     server.serve_forever()
+with HTTPServer(('', 443), handler) as server:
+    server.serve_forever()
 
-
-app = Flask(__name__)
-
-# app.config['SERVER_NAME'] = 'lobanva.ml'
-
-@app.route('/')
-def index():
-    return 'Hello!'
-
-@app.route('/post_json', methods=['POST'])
-def process_json():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        json = request.json
-        return json
-    else:
-        return 'Content-Type not supported!'
-
-app.run(port=8000, debug=False)
 
