@@ -26,6 +26,7 @@ class handler(BaseHTTPRequestHandler):
         print (message)        
 
 with HTTPServer(('', 443), handler) as server:
+    print("HTTPServer")
     server.serve_forever()
 
 
