@@ -29,7 +29,7 @@ class handler(BaseHTTPRequestHandler):
 httpd = HTTPServer(('', 443), handler)
 print("HTTPServer")
 
-httpd.socket = SSLContext.wrap_socket(httpd.socket,
+httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
         certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', server_side=True)
 # httpd.socket = ssl.wrap_socket (httpd.socket,
