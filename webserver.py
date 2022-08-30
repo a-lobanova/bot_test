@@ -31,8 +31,8 @@ print("HTTPServer")
 
 
 httpd.socket = ssl.wrap_socket (httpd.socket,
-        keyfile="path/tp/key.pem",
-        certfile='path/to/cert.pem', server_side=True)
+        keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
+        certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', server_side=True)
 httpd.serve_forever()   
 
 # with HTTPServer(('', 443), handler) as server:
