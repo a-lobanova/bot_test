@@ -26,7 +26,7 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(message), "utf8"))
         print (message)     
 
-httpd = HTTPServer(('', 443), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('', 443), handler)
 print("HTTPServer")
 
 
