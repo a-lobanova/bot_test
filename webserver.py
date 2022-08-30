@@ -4,14 +4,15 @@ import requests
 # from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
+import ssl
 
 class handler(BaseHTTPRequestHandler):
+    print("line 9")
     def do_GET(self):
         print("do_GET")
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-
         message = "Lobanova senior-pomidor!!!11"
         self.wfile.write(bytes(message, "utf8"))
 
@@ -23,10 +24,19 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
         self.wfile.write(bytes(json.dumps(message), "utf8"))
-        print (message)        
+        print (message)     
 
-with HTTPServer(('', 443), handler) as server:
-    print("HTTPServer")
-    server.serve_forever()
+httpd = HTTPServer(('', 443), SimpleHTTPRequestHandler)
+print("HTTPServer")
+
+
+httpd.socket = ssl.wrap_socket (httpd.socket,
+        keyfile="path/tp/key.pem",
+        certfile='path/to/cert.pem', server_side=True)
+httpd.serve_forever()   
+
+# with HTTPServer(('', 443), handler) as server:
+#     print("HTTPServer")
+#     server.serve_forever()
 
 
