@@ -61,11 +61,7 @@ contextInstance.verify_mode     = ssl.CERT_REQUIRED;
 
 # Load the CA certificates used for validating the peer's certificate
 
-contextInstance.load_verify_locations(cafile=os.path.relpath(certifi.where()),
-
-                                      capath="/etc/letsencrypt/live/lobanova.ml/fullchain.pem",
-
-                                      cadata="/etc/letsencrypt/live/lobanova.ml/privkey.pem");
+contextInstance.load_verify_locations("/etc/letsencrypt/live/lobanova.ml/fullchain.pem");
 
  
 
