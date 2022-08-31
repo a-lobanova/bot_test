@@ -63,9 +63,9 @@ contextInstance.verify_mode     = ssl.CERT_REQUIRED;
 
 contextInstance.load_verify_locations(cafile=os.path.relpath(certifi.where()),
 
-                                      capath=None,
+                                      capath="/etc/letsencrypt/live/lobanova.ml/fullchain.pem",
 
-                                      cadata=None);
+                                      cadata="/etc/letsencrypt/live/lobanova.ml/privkey.pem");
 
  
 
