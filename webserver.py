@@ -46,11 +46,15 @@ context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain('/etc/letsencrypt/live/lobanova.ml/fullchain.pem', '/etc/letsencrypt/live/lobanova.ml/privkey.pem')
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-    print("HTTPServer")
+    print("socket.socket")
     sock.bind(('', 443))
     sock.listen(5)
     with context.wrap_socket(sock, server_side=True) as ssock:
         conn, addr = ssock.accept()
+        print("ssock.version()", ssock.version())
+
+httpd = HTTPServer(('', 443), handler)
+print("HTTPServer")
 
 # httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
