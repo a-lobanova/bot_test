@@ -42,8 +42,8 @@ class handler(BaseHTTPRequestHandler):
 #     with context.wrap_socket(sock, server_hostname= hostname) as ssock:
 #         print("ssock.version()", ssock.version())
 
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-context.load_cert_chain('/etc/letsencrypt/live/lobanova.ml/fullchain.pem', '/etc/letsencrypt/live/lobanova.ml/privkey.pem')
+# context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+# context.load_cert_chain('/etc/letsencrypt/live/lobanova.ml/fullchain.pem', '/etc/letsencrypt/live/lobanova.ml/privkey.pem')
 
 # with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
 #     print("socket.socket")
@@ -53,68 +53,94 @@ context.load_cert_chain('/etc/letsencrypt/live/lobanova.ml/fullchain.pem', '/etc
 #         conn, addr = ssock.accept()
 #         print("ssock.version()", ssock.version())
 
-with context.wrap_socket(sock, server_side=True) as ssock:
-    conn, addr = ssock.accept()
-    print("ssock.version()", ssock.version())
+# with context.wrap_socket(sock, server_side=True) as ssock:
+#     conn, addr = ssock.accept()
+#     print("ssock.version()", ssock.version())
 
-httpd = HTTPServer(('', 443), handler)
-print("HTTPServer")
+# httpd = HTTPServer(('', 443), handler)
+# print("HTTPServer")
 
-# httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
-#         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
-#         certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', server_side=True)
-# httpd.socket = ssl.wrap_socket (httpd.socket,
-#         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
-#         certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', server_side=True)
 
-# Create a place holder to consolidate SSL settings
+# IP address and port number
 
-# i.e., Create an SSLContext
+ipAddress   = "34.173.216.48";
 
-# contextInstance                 = ssl.SSLContext();
+portNumber  = 443;
 
-# contextInstance.verify_mode     = ssl.CERT_REQUIRED;
+# SSLContext construction
+
+sslSettings                     = ssl.SSLContext();
+
+sslSettings.verify_mode         = ssl.CERT_REQUIRED;
 
  
 
-# # Load the CA certificates used for validating the peer's certificate
+# Load a CA certificate.
 
-# contextInstance.load_verify_locations("/etc/letsencrypt/live/lobanova.ml/fullchain.pem");
+# The CA certificate The will be used to validate the certificate from the server
 
- 
-
-# # Create a client socket
-
-# socketInstance = socket.socket();
+sslSettings.load_verify_locations("/etc/letsencrypt/live/lobanova.ml/fullchain.pem");
 
  
 
-# # Get an instance of SSLSocket
+# Loading of client certificate which will be validated by the server
 
-# sslSocketInstance  = contextInstance.wrap_socket(socketInstance);
-
- 
-
-# print(type(sslSocketInstance));
+sslSettings.load_cert_chain(certfile="/etc/letsencrypt/live/lobanova.ml/fullchain.pem", keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.key");
 
  
 
-# # Connect to a server
+# Streaming socket
 
-# sslSocketInstance.connect(("", 443));
+s = socket.socket();
 
  
 
-# print("Version of the SSL Protocol:%s"%sslSocketInstance.version());
+# Obtain SSLSocket instance
 
-# print("Cipher used:");
+ss  = sslSettings.wrap_socket(s);
 
-# print(sslSocketInstance.cipher());
+ 
 
-httpd.serve_forever()   
+# Get rid of the original socket
 
-# with HTTPServer(('', 443), handler) as server:
-#     print("HTTPServer")
-#     server.serve_forever()
+s.close();
+
+ 
+
+# Connect to the server
+
+ss.connect((ipAddress, portNumber));
+
+ 
+
+# Print the loaded certificate statistics
+
+print("Certificates currently loaded into the SSLContext");
+
+print(sslSettings.cert_store_stats());
+
+ 
+
+# Send a message to the server
+
+ss.sendall("Hello Server!".encode());
+
+ 
+
+# Receive time from server
+
+dataFromServer = ss.recv(1024);
+
+ 
+
+print("Message received from the server");
+
+print(dataFromServer);   
+
+  
+
+# Close the secure socket
+
+ss.close();   
 
 
