@@ -31,9 +31,9 @@ httpd = HTTPServer(('', 443), handler)
 print("HTTPServer")
 
 # hostname = 'www.lobanova.ml:443'
-# # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
-# context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-# context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
+# PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
     with context.wrap_socket(sock, server_hostname= "") as ssock:
