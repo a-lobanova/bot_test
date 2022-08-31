@@ -63,7 +63,7 @@ class handler(BaseHTTPRequestHandler):
 
 # IP address and port number
 
-ipAddress   = "34.173.216.48";
+ipAddress   = "";
 
 portNumber  = 443;
 
