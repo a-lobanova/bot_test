@@ -32,12 +32,12 @@ print("HTTPServer")
 
 # hostname = 'www.lobanova.ml:443'
 # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
+# context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+# context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-    with context.wrap_socket(sock, server_hostname= "") as ssock:
-        print("ssock.version()", ssock.version())
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+#     with context.wrap_socket(sock, server_hostname= "") as ssock:
+#         print("ssock.version()", ssock.version())
 
 # httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
@@ -45,6 +45,55 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
 # httpd.socket = ssl.wrap_socket (httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
 #         certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', server_side=True)
+
+# Create a place holder to consolidate SSL settings
+
+# i.e., Create an SSLContext
+
+contextInstance                 = ssl.SSLContext();
+
+contextInstance.verify_mode     = ssl.CERT_REQUIRED;
+
+ 
+
+# Load the CA certificates used for validating the peer's certificate
+
+contextInstance.load_verify_locations(cafile=os.path.relpath(certifi.where()),
+
+                                      capath=None,
+
+                                      cadata=None);
+
+ 
+
+# Create a client socket
+
+socketInstance = socket.socket();
+
+ 
+
+# Get an instance of SSLSocket
+
+sslSocketInstance  = contextInstance.wrap_socket(socketInstance);
+
+ 
+
+print(type(sslSocketInstance));
+
+ 
+
+# Connect to a server
+
+sslSocketInstance.connect(("", 443));
+
+ 
+
+print("Version of the SSL Protocol:%s"%sslSocketInstance.version());
+
+print("Cipher used:");
+
+print(sslSocketInstance.cipher());
+
 httpd.serve_forever()   
 
 # with HTTPServer(('', 443), handler) as server:
