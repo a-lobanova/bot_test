@@ -15,8 +15,8 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         print("do_GET")
         self.send_response(200)
-        self.send_header('Content-type','text/html')
-        self.end_headers()
+        # self.send_header('Content-type','text/html')
+        # self.end_headers()
         message = "Lobanova senior-pomidor!!!11"
         self.wfile.write(bytes(message, "utf8"))
 
