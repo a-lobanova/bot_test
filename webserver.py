@@ -6,6 +6,9 @@ from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
 import ssl
 import socket
+import certifi
+
+import os
 
 class handler(BaseHTTPRequestHandler):
     print("line 9")
