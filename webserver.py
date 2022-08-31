@@ -33,11 +33,11 @@ print("HTTPServer")
 hostname = 'www.lobanova.ml'
 # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
+context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/privkey.pem')
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
     with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-        print(ssock.version())
+        print("ssock.version()", ssock.version())
 
 # httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
