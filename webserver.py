@@ -30,17 +30,27 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(message), "utf8"))
         print (message)     
 
-httpd = HTTPServer(('', 443), handler)
-print("HTTPServer")
+# httpd = HTTPServer(('', 443), handler)
+# print("HTTPServer")
 
-hostname = 'lobanova.ml:443'
-# PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
+# hostname = 'lobanova.ml'
+# # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
+# context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+# context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain6.pem')
+
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+#     with context.wrap_socket(sock, server_hostname= hostname) as ssock:
+#         print("ssock.version()", ssock.version())
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain('/etc/letsencrypt/live/lobanova.ml/fullchain.pem', '/etc/letsencrypt/live/lobanova.ml/privkey.pem')
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-    with context.wrap_socket(sock, server_hostname= hostname) as ssock:
-        print("ssock.version()", ssock.version())
+    print("HTTPServer")
+    sock.bind(('', 443))
+    sock.listen(5)
+    with context.wrap_socket(sock, server_side=True) as ssock:
+        conn, addr = ssock.accept()
 
 # httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
