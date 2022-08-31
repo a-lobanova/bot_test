@@ -8,6 +8,9 @@ from db import Database
 from const import Const
 # from yookassa import Payment
 import requests
+import pandas as pd
+import xlsxwriter
+
 # from telebot import types
 
 const = Const
@@ -28,9 +31,7 @@ dp = Dispatcher(bot)
 
 db = Database('database.db')
 
-adminId = 416370888
-
-# previosOrderStatus = "test"
+adminId = const.adminId
 
 def dataOutput(records, text):
     answer = f"Все заказы за промежуток времени - {text}\n"
@@ -44,16 +45,22 @@ def dataOutput(records, text):
     return(answer)
 
 def orderIdFromMessege(text):
-    # print("call.message.text", text)
     s = text
     result = re.findall("Номер заказа - \d+", s)
-    # print("result", result)
-    # print("type result", type(result))
     mystr = ' '.join(map(str,result))
-    # print("mystr", mystr)
     number_result = [int(number_result) for number_result in str.split(mystr) if number_result.isdigit()]
-    # print("number_result", number_result)
-    return(number_result)               
+    return(number_result)  
+
+def report(text):
+    interval = text
+    records = db.get_all_orders_in_time(interval)
+    if(records):
+        answer = dataOutput(records, interval)
+        markup = nav.changeMarkup()
+    else:
+        answer = "Записей не обнаружено!"
+        markup = None
+    return[answer, markup]
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
@@ -119,12 +126,8 @@ async def bot_message(message: types.Message):
             print("buyer_message 1")
             order_id = db.get_order_id("wait price")
             user_id = db.get_user_id_through_order_id(order_id)
-            # print("order_Id", order_id)
-            # print("user_id", user_id)
-            print("price", message.text)
             try:
                 a = int(message.text)
-                print("try", message.text)
                 db.set_price(order_id, message.text)
                 db.set_orderStatus(order_id, "wait payment")
                 summa = round((int(message.text) + 50) * rate)
@@ -150,48 +153,52 @@ async def bot_message(message: types.Message):
             except Exception as e:
                 print(repr(e))
                 await message.reply("Ожидается ввод суммы")
-        # elif(db.order_status_exists("edit")):
-        #     print(" admin messege Редактирование заказа")
-        #     order_id = db.get_order_id("edit")
-        #     db.editOrder(order_id, message.text)
-        #     db.set_orderStatus(previosOrderStatus)
-        #     previosOrderStatus = 0
 
         elif message.text == 'Все заказы':
                 await bot.send_message(adminId, "Выберите интервал времени", reply_markup = nav.allOrdersMarkup())
         elif message.text == "День":
-                records = db.get_all_orders_in_time("day")
-                if(records):
-                    answer = dataOutput(records, message.text)
-                    await bot.send_message(adminId, answer, reply_markup = nav.changeMarkup())
-                else:
-                    await message.reply("Записей не обнаружено!")
+            answer = report("day")[0]
+            markup = report("day")[1]
+            await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == "Неделя":
-                records = db.get_all_orders_in_time("week")
-                if(records):
-                    answer = dataOutput(records, message.text)
-                    await bot.send_message(adminId, answer, reply_markup = nav.changeMarkup())
-                else:
-                    await message.reply("Записей не обнаружено!")
+            answer = report("week")[0]
+            markup = report("week")[1]
+            await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == "Две недели":
-                records = db.get_all_orders_in_time("2weeks")
-                if(records):
-                    answer = dataOutput(records, message.text)
-                    await bot.send_message(adminId, answer, reply_markup = nav.changeMarkup())
-                else:
-                    await message.reply("Записей не обнаружено!")
+            answer = report("2weeks")[0]
+            markup = report("2weeks")[1]
+            await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == "Месяц":
-                records = db.get_all_orders_in_time("month")
-                if(records):
-                    answer = dataOutput(records, message.text)
-                    await bot.send_message(adminId, answer, reply_markup = nav.changeMarkup())
-                else:
-                    await message.reply("Записей не обнаружено!")
+            answer = report("month")[0]
+            markup = report("month")[1]
+            await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == "Все время":
                 records = db.get_all_orders_in_time("all")
                 if(records):
+                    row = 1
+                    col = 0
                     answer = dataOutput(records, message.text)
+                    workbook = xlsxwriter.Workbook('/Users/nastya/Desktop/telegram_bot_test/Report.xlsx')
+                    worksheet = workbook.add_worksheet()
+                    for r in records:
+                        worksheet.write('A1', 'Номер заказа')
+                        worksheet.write('B1', 'Клиент')
+                        worksheet.write('C1', 'Наименование')
+                        worksheet.write('D1', 'Дата заказа')
+                        worksheet.write('E1', 'Цена заказа в евро')
+                        worksheet.write('F1', 'Статус заказа')
+                        worksheet.write('G1', 'Дата обновления')
+                        worksheet.write(row, col, r[0]) 
+                        worksheet.write(row, col + 1, db.get_nickname(r[1]))
+                        worksheet.write(row, col+2, r[2]) 
+                        worksheet.write(row, col + 3, r[3]) 
+                        worksheet.write(row, col + 4, r[4]) 
+                        worksheet.write(row, col+5, r[5]) 
+                        worksheet.write(row, col + 6, r[10])
+                        row += 1
+                    workbook.close()
                     await bot.send_message(adminId, answer, reply_markup = nav.changeMarkup())
+                    await bot.send_document(adminId, document=open('Report.xlsx', 'rb'))
                 else:
                     await message.reply("Записей не обнаружено!")
         elif message.text == "❌ Отмена":
@@ -216,12 +223,9 @@ async def callback_inline(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "UKassa")
 async def callback_inline(call: types.CallbackQuery):
-    # print(" UKassa call", call)
-    # order_id = orderIdFromMessege(call.message.text)
     orderId = str(orderIdFromMessege(call.message.text))
     f = filter(str.isdecimal, orderId)
     order_id = "".join(f)
-    print ("order_id", order_id)
     if db.get_orderStatus(order_id) == "wait payment":
         print("db.get_orderStatus(order_id) == wait payment")
         amount = str(round(db.get_rubprice(order_id)))+"00"
@@ -235,7 +239,6 @@ async def callback_inline(call: types.CallbackQuery):
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
-        # print("orderDesc", description)
         await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     else:
@@ -250,9 +253,6 @@ async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery)
 
 @dp.message_handler(content_types=ContentTypes.SUCCESSFUL_PAYMENT)
 async def process_pay(message: types.Message):
-    # print("message", message)
-    # print(ContentTypes.SUCCESSFUL_PAYMENT)
-    # print("cancellation_details", Payment.cancellation_details)
     order_id = message.successful_payment.invoice_payload
     print("order_id", order_id)
     if db.order_exists(message.successful_payment.invoice_payload):
@@ -262,7 +262,6 @@ async def process_pay(message: types.Message):
             db.set_update(order_id) 
             user_id = db.get_user_id_through_order_id(order_id)
             order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
-            # order_inform_for_user = "Оплата за заказ получена \n" + db.get_paid_order_through_order_id(order_id) 
             # remove inline buttons
             print("db.get_message_id(order_id)", db.get_message_id(order_id))
             await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
@@ -274,54 +273,41 @@ async def process_pay(message: types.Message):
             db.set_update(order_id) 
             user_id = db.get_user_id_through_order_id(order_id)
             order_inform = "Доставка оплачена через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_delivery_paid_order_through_order_id(order_id)  
-            # remove inline buttons
-            print("db.get_message_id(order_id)", db.get_message_id(order_id))
+                # remove inline buttons
             await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за ДОСТАВКУ заказа #" + order_id)
             await bot.send_message(message.from_user.id, "Платеж за доставку принят!")
             await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id))
 
 @dp.callback_query_handler()
 async def callback_inline(call):
-    print ("callback_query_handler")
     try:
         if call.message:
             if call.data:
-                print("call", call)
-                # print("call.data", call.data)
+                # print("call", call)
                 if "ok" in call.data:
                     print ("Подтвердить")
-                    # print("call.message", call.message)
-                    # print("test", call.message.reply_markup.inline_keyboard[0][0].callback_data)
                     okOrderId = call.data.partition("ok")[2]
                     db.set_update(okOrderId)
                     print("type(okOrderId)", type(okOrderId))
                         # remove inline buttons
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text + f'\nЗаказ подтвержден, введите сумму в евро к оплате. Курс на сегодня 1EUR = {rate} руб.',
                         reply_markup=None)
-                    # await bot.send_message(call.message.chat.id, f'Заказ {okOrderId} подтвержден, введите сумму в евро к оплате. Курс на сегодня 1EUR = {rate} руб.')
                     db.set_orderStatus(okOrderId, "wait price") 
                 elif "cancel" in call.data:
                     print ("Отменить заказ")
                     orderStatus = " "
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text + f'\nЗаказ отменен. Сообщение для пользователя: Заказ отменен. Мы свяжемся с вами лично для уточнения деталей.',
                         reply_markup=None)
-                    # await bot.send_message(call.message.chat.id, 'Заказ отменен. Сообщение для пользователя: Заказ отменен. Мы свяжемся с вами лично для уточнения деталей.')
                     okOrderId = call.data.partition("cancel")[2]
-                    print("okOrderId", okOrderId)
-                    print("type(orderStatus)", type(okOrderId))
                     orderStatus = db.get_orderStatus(okOrderId)
-                    print("type(orderStatus)", type(orderStatus))
-                    print("1 orderStatus", orderStatus)
                     db.set_orderStatus(okOrderId, "Canceled") 
                     orderStatus = db.get_orderStatus(okOrderId)
-                    print(" 2 orderStatus", orderStatus)
                     user_id = db.get_user_id_through_order_id(okOrderId)
                     await bot.send_message(user_id, "Заказ отменен. Мы свяжемся с Вами лично для уточнения деталей.")
+
                 elif "Оплатить" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print ("Оплата")
-                    print("Оплата call",call)
                     paymentOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
-                    # print("paymentOrderId", paymentOrderId)
                          # remove inline buttons
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text,
                         reply_markup=nav.paymentOptionsMarkup())
@@ -329,7 +315,6 @@ async def callback_inline(call):
                     db.set_update(paymentOrderId)
                     order_inform = "Заказ находится на стадии оплаты \n" + "Пользователь: " + db.get_nickname(user_id) + db.get_order_through_order_id(paymentOrderId) 
                     msg = await bot.send_message(adminId, order_inform, reply_markup = nav.paymentComplitedMarkup(paymentOrderId))
-                    # print(msg["message_id"])
                     db.set_message_id(paymentOrderId, msg["message_id"])
 
                 elif "Оплата за заказ получена" == call.message.reply_markup.inline_keyboard[0][0].text:
@@ -342,8 +327,8 @@ async def callback_inline(call):
                                     # remove inline buttons
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform,
                         reply_markup=nav.orderRedeemedMurkup(paymentOrderId))
-                    # await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(paymentOrderId))
                     await bot.send_message(user_id, order_inform_for_user)
+
                 elif "Заказ выкуплен" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print("orderRedeemed")
                     redeemedOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
@@ -353,13 +338,11 @@ async def callback_inline(call):
                     order_inform_for_user = "Заказ выкуплен \n" + db.get_paid_order_through_order_id(redeemedOrderId) + "Ожидайте уведомления о стоимости доставки\n" 
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform + "\nВведите сумму доставки в евро:",
                         reply_markup=None)
-                    # await bot.send_message(adminId, order_inform)
                     db.set_orderStatus(redeemedOrderId, "orderRedeemed")
-                    # await bot.send_message(adminId, "Введите сумму доставки:")
                     await bot.send_message(user_id, order_inform_for_user)
+
                 elif "Оплатить доставку" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print ("Оплата доставки")
-                    print("call.message.from_id",call.message.from_id)
                     deliveryPaymentOrderId = call.message.reply_markup.inline_keyboard[0][0].callback_data
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text,
                         reply_markup=nav.paymentOptionsMarkup())
@@ -376,7 +359,6 @@ async def callback_inline(call):
                     order_inform_for_user = "Оплата за доставку получена \n" + db.get_delivery_paid_order_through_order_id(deliveryPaymentOrderId) 
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = order_inform,
                         reply_markup=nav.sentOrderMurkup(deliveryPaymentOrderId))
-                    # await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(deliveryPaymentOrderId))
                     await bot.send_message(user_id, order_inform_for_user)
                 elif "Заказ отправлен" == call.message.reply_markup.inline_keyboard[0][0].text:
                     print("Заказ отправлен")
@@ -391,53 +373,21 @@ async def callback_inline(call):
                     await bot.send_message(user_id, order_inform_for_user)
                 elif "change" in call.data:
                     print("Изменить заказы")
-                    print("call.message.text", call.message.text)
                     s = call.message.text
                     result = re.findall("📦Номер заказа - \d+", s)
-                    print("result", result)
-                    print("type result", type(result))
                     mystr = ' '.join(map(str,result))
-                    print("mystr", mystr)
                     number_result = [int(number_result) for number_result in str.split(mystr) if number_result.isdigit()]
-                    print("number_result", number_result)
-                    print("number_result", type(number_result))
                     for item in number_result:
-                        print("item", item)
-                        print("item", type(item))
                         answer = db.get_order_through_order_id(item)
                         await bot.send_message(adminId, answer, reply_markup = nav.changesMarkup())
                 elif "delete" in call.data:
                     orderId = orderIdFromMessege(call.message.text)
-                    print("number_result", orderId)
                     db.delete_order(orderId)
                     await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = "Заказ удален!",
                         reply_markup=None)
                 elif "edit" in call.data:
-                    # global previosOrderStatus
                     print("Редактировние наименования заказа edit")
-                    # orderId = str(orderIdFromMessege(call.message.text))
-                    # f = filter(str.isdecimal, orderId)
-                    # orderId1 = "".join(f)
-                    # orderStatus = ""
-                    # orderStatus = db.get_orderStatus(orderId1)
-                    # db.set_orderStatus(orderId1, "orderEdit") 
-                    # orderStatus = db.get_orderStatus(orderId1)
                     await bot.send_message(adminId, "Функция Редактирование - в разработке 🔧")
-                
-                    
-                # if call.data == 'good':
-                #     # await bot.send_message(call.message.chat.id, 'Заказ подтвержден, введите сумму к оплате: ')
-                #     print("call.message.chat.id",call.message.chat.id)
-                # elif call.data == 'bad':
-                #     await bot.send_message(call.message.chat.id, 'Заказ отменен')
-     
-                # remove inline buttons
-            # await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = call.message.text,
-            #     reply_markup=None)
-     
-                # # show alert
-                # await bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
-                #     text="ЭТО ТЕСТОВОЕ УВЕДОМЛЕНИЕ!!11")
      
     except Exception as e:
         print(repr(e))
