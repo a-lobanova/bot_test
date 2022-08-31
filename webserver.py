@@ -31,8 +31,13 @@ class handler(BaseHTTPRequestHandler):
         print (message)     
 
 
-httpd = HTTPServer(('', 8080), handler)
-# httpd.socket = ssl.wrap_socket (httpd.socket, certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.pem',  server_side=True)
+httpd = HTTPServer(('', 443), handler)
+httpd.socket = ssl.wrap_socket(
+    httpd.socket, 
+    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
+    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
+    ssl_version=ssl.PROTOCOL_TLS,
+    server_side=True)
 httpd.serve_forever()
 
 # print("HTTPServer")
