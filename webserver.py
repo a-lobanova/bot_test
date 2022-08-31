@@ -33,14 +33,14 @@ class handler(BaseHTTPRequestHandler):
 httpd = HTTPServer(('', 443), handler)
 print("HTTPServer")
 
-# hostname = 'www.lobanova.ml:443'
-# PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
-# context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-# context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
+hostname = 'lobanova.ml:443'
+PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/fullchain.pem')
 
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-#     with context.wrap_socket(sock, server_hostname= "") as ssock:
-#         print("ssock.version()", ssock.version())
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+    with context.wrap_socket(sock, server_hostname= "") as ssock:
+        print("ssock.version()", ssock.version())
 
 # httpd.socket = ssl.SSLContext.wrap_socket(httpd.socket,
 #         keyfile="/etc/letsencrypt/live/lobanova.ml/privkey.pem",
@@ -53,45 +53,45 @@ print("HTTPServer")
 
 # i.e., Create an SSLContext
 
-contextInstance                 = ssl.SSLContext();
+# contextInstance                 = ssl.SSLContext();
 
-contextInstance.verify_mode     = ssl.CERT_REQUIRED;
-
- 
-
-# Load the CA certificates used for validating the peer's certificate
-
-contextInstance.load_verify_locations("/etc/letsencrypt/live/lobanova.ml/fullchain.pem");
+# contextInstance.verify_mode     = ssl.CERT_REQUIRED;
 
  
 
-# Create a client socket
+# # Load the CA certificates used for validating the peer's certificate
 
-socketInstance = socket.socket();
-
- 
-
-# Get an instance of SSLSocket
-
-sslSocketInstance  = contextInstance.wrap_socket(socketInstance);
+# contextInstance.load_verify_locations("/etc/letsencrypt/live/lobanova.ml/fullchain.pem");
 
  
 
-print(type(sslSocketInstance));
+# # Create a client socket
+
+# socketInstance = socket.socket();
 
  
 
-# Connect to a server
+# # Get an instance of SSLSocket
 
-sslSocketInstance.connect(("", 443));
+# sslSocketInstance  = contextInstance.wrap_socket(socketInstance);
 
  
 
-print("Version of the SSL Protocol:%s"%sslSocketInstance.version());
+# print(type(sslSocketInstance));
 
-print("Cipher used:");
+ 
 
-print(sslSocketInstance.cipher());
+# # Connect to a server
+
+# sslSocketInstance.connect(("", 443));
+
+ 
+
+# print("Version of the SSL Protocol:%s"%sslSocketInstance.version());
+
+# print("Cipher used:");
+
+# print(sslSocketInstance.cipher());
 
 httpd.serve_forever()   
 
