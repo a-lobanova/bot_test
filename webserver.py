@@ -30,7 +30,7 @@ class handler(BaseHTTPRequestHandler):
 httpd = HTTPServer(('', 443), handler)
 print("HTTPServer")
 
-hostname = 'www.lobanova.ml'
+hostname = 'www.lobanova.ml:443'
 # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 context.load_verify_locations('/etc/letsencrypt/live/lobanova.ml/privkey.pem')
