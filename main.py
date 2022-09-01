@@ -1,6 +1,7 @@
 import logging
 import telebot
 import re
+import yookassa
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.message import ContentTypes
 import markups as nav
@@ -8,8 +9,10 @@ from db import Database
 from const import Const
 # from yookassa import Payment
 import requests
-import pandas as pd
+# import pandas as pd
 import xlsxwriter
+import uuid
+from yookassa import Configuration, Payment, Webhook, Settings
 
 # from telebot import types
 
@@ -22,7 +25,7 @@ rate = (data['payload']['rates'][72]['sell'])
 print(rate)
 
 TOKEN = const.token
-
+    
 logging.basicConfig(level = logging.INFO)
 
 bot = Bot(token = TOKEN)
@@ -32,6 +35,36 @@ dp = Dispatcher(bot)
 db = Database('database.db')
 
 adminId = const.adminId
+
+Configuration.account_id = const.Configuration_account_id
+Configuration.secret_key = const.Configuration_secret_key
+
+Configuration.configure_auth_token(const.access_token)
+
+settings = Settings.get_account_settings()
+print(settings)
+
+payment = Payment.create({
+    "amount": {
+        "value": "100.00",
+        "currency": "RUB"
+    },
+    "confirmation": {
+        "type": "redirect",
+        "return_url": "https://www.lobanova.ml"
+    },
+    "capture": True,
+    "description": "Заказ №1"
+}, uuid.uuid4())
+
+
+# response = Webhook.add({
+#     "event": "payment.succeeded",
+#     "url": "https://www.lobanova.ml",
+# })
+
+list = Webhook.list()
+print("webhook list", list)
 
 def dataOutput(records, text):
     answer = f"Все заказы за промежуток времени - {text}\n"
@@ -254,7 +287,7 @@ async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery)
 @dp.message_handler(content_types=ContentTypes.SUCCESSFUL_PAYMENT)
 async def process_pay(message: types.Message):
     order_id = message.successful_payment.invoice_payload
-    print("order_id", order_id)
+    print("message", message)
     if db.order_exists(message.successful_payment.invoice_payload):
         # Уведомление об успешном платеже за заказ 
         if db.get_orderStatus(order_id) == "wait payment":
