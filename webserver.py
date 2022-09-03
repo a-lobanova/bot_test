@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import requests
-# from django.http import HttpResponse
+from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
 from flask import Flask, request
 import ssl
@@ -28,7 +28,24 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
         self.wfile.write(bytes(json.dumps(message), "utf8"))
-        print (message)     
+        print (message)    
+
+    def my_webhook_handler(request):
+        event_json = json.loads(request.body)
+        return HttpResponse(status=200)
+
+    # Cоздайте объект класса уведомлений в зависимости от события
+    try:
+        notification_object = WebhookNotification(event_json)
+        payment = notification_object.object 
+        print(payment)
+    except Exception:
+        # обработка ошибок
+        print("error")
+
+# # Получите объекта платежа
+# payment = notification_object.object 
+# print(payment)
 
 
 httpd = HTTPServer(('', 443), handler)
