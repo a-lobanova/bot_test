@@ -43,7 +43,7 @@ adminId = const.adminId
 Configuration.account_id = const.Configuration_account_id
 Configuration.secret_key = const.Configuration_secret_key
 
-Configuration.configure_auth_token(const.access_token)
+# Configuration.configure_auth_token(const.access_token)
 
 settings = Settings.get_account_settings()
 print(settings)
@@ -315,6 +315,8 @@ async def callback_inline(call: types.CallbackQuery):
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
         # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
+        list = Webhook.list()
+        print (list)
         print("payment_deatils", payment_deatils)
         if check_payment(payment_deatils['id']):
             print("check_payment") 
