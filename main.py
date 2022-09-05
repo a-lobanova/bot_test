@@ -334,15 +334,15 @@ async def callback_inline(call: types.CallbackQuery):
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
-        payment_deatils = payment(amountPrice, description)
-        if await check_payment(payment_deatils['id']):
-            print("check_payment") 
-            paymentID = payment_deatils['id']
-            print("payment_deatils['id']", paymentID)
-            print("платеж")
+        # payment_deatils = payment(amountPrice, description)
+        # if await check_payment(payment_deatils['id']):
+        #     print("check_payment") 
+        #     paymentID = payment_deatils['id']
+        #     print("payment_deatils['id']", paymentID)
+        #     print("платеж")
         
-        else:
-            print("платеж не прошел")
+        # else:
+        #     print("платеж не прошел")
         await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     else:
