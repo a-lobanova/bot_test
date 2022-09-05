@@ -7,6 +7,9 @@ from flask import Flask, request
 import ssl
 import socket
 import certifi
+import var_dump as var_dump
+from yookassa import Webhook
+from yookassa.domain.notification import WebhookNotificationEventType
 
 import os
 
@@ -31,17 +34,29 @@ class handler(BaseHTTPRequestHandler):
         print (message)    
 
     def my_webhook_handler(request):
+        print("my_webhook_handler(request):")
         event_json = json.loads(request.body)
+        try:
+            # Создание объекта класса уведомлений в зависимости от события
+            notification_object = WebhookNotificationFactory().create(event_json)
+            response_object = notification_object.object
+            if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
+                some_data = {
+                    'paymentId': response_object.id,
+                    'paymentStatus': response_object.status,
+                }
+                # Специфичная логика
+                # ...
+            elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
+                some_data = {
+                    'paymentId': response_object.id,
+                    'paymentStatus': response_object.status,
+                }
+        except Exception:
+        # Обработка ошибок
+            print("# Сообщаем кассе об ошибке")
+            return HttpResponse(status=400)  # Сообщаем кассе об ошибке
         return HttpResponse(status=200)
-
-    # Cоздайте объект класса уведомлений в зависимости от события
-    try:
-        notification_object = WebhookNotification(event_json)
-        payment = notification_object.object 
-        print(payment)
-    except Exception:
-        # обработка ошибок
-        print("error")
 
 # # Получите объекта платежа
 # payment = notification_object.object 
