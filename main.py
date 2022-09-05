@@ -43,7 +43,7 @@ adminId = const.adminId
 Configuration.account_id = const.Configuration_account_id
 Configuration.secret_key = const.Configuration_secret_key
 
-# Configuration.configure_auth_token(const.access_token)
+Configuration.configure_auth_token(const.access_token)
 
 settings = Settings.get_account_settings()
 print(settings)
