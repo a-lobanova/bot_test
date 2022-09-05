@@ -14,6 +14,10 @@ import xlsxwriter
 import uuid
 from yookassa import Configuration, Payment, Webhook, Settings
 
+import json
+from django.http import HttpResponse
+from yookassa.domain.notification import WebhookNotification
+
 # from telebot import types
 
 const = Const
@@ -44,18 +48,9 @@ Configuration.configure_auth_token(const.access_token)
 settings = Settings.get_account_settings()
 print(settings)
 
-payment = Payment.create({
-    "amount": {
-        "value": "100.00",
-        "currency": "RUB"
-    },
-    "confirmation": {
-        "type": "redirect",
-        "return_url": "https://www.lobanova.ml"
-    },
-    "capture": True,
-    "description": "Заказ №1"
-}, uuid.uuid4())
+params = {'limit': 2}
+res1 = Payment.list(params)
+print('res1', res1)
 
 
 # response = Webhook.add({
@@ -65,6 +60,58 @@ payment = Payment.create({
 
 list = Webhook.list()
 print("webhook list", list)
+
+
+def my_webhook_handler(request):
+    event_json = json.loads(request.body)
+    return HttpResponse(status=200)
+
+# Cоздайте объект класса уведомлений в зависимости от события
+try:
+    notification_object = WebhookNotification(event_json)
+    payment = notification_object.object
+    print(payment)
+except Exception:
+    print(" # обработка ошибок error")
+    # обработка ошибок
+
+# # Получите объекта платежа
+# payment = notification_object.object
+
+def payment(value,description):
+    print("payment_def\n")
+    payment = Payment.create({
+    "amount": {
+        "value": value,
+        "currency": "RUB"
+    },
+    "payment_method_data": {
+        "type": "bank_card"
+    },
+    "confirmation": {
+        "type": "redirect",
+        "return_url": "www.lobanova.ml"
+    },
+    "capture": True,
+    "description": description
+    }, uuid.uuid4())
+
+    return json.loads(payment.json())
+
+def check_payment(payment_id):
+    payment = json.loads((Payment.find_one(payment_id)).json())
+    while payment['status'] == 'pending':
+        payment = json.loads((Payment.find_one(payment_id)).json())
+        # ///////await asyncio.sleep(3)
+
+    if payment['status']=='succeeded':
+        print("SUCCSESS RETURN")
+        print(payment)
+        return True
+    else:
+        print("BAD RETURN")
+        print(payment)
+        return False
 
 def dataOutput(records, text):
     answer = f"Все заказы за промежуток времени - {text}\n"
@@ -264,30 +311,50 @@ async def callback_inline(call: types.CallbackQuery):
         amount = str(round(db.get_rubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
+        payment_deatils = payment(150, description)
+        await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
+        # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
+            # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
+        print("payment_deatils", payment_deatils)
+        if check_payment(payment_deatils['id']):
+            print("check_payment") 
+            paymentID = payment_deatils['id']
+            print("payment_deatils['id']", paymentID)
+            print("платеж")
+        else:
+            print("платеж не прошел")
         print("orderDesc", description)
-        await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
-            currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     elif db.get_orderStatus(order_id) == "wait delivery payment":
         print("db.get_orderStatus(order_id) == wait delivery payment")
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
+        payment_deatils = payment(amountPrice, description)
+        if await check_payment(payment_deatils['id']):
+            print("check_payment") 
+            paymentID = payment_deatils['id']
+            print("payment_deatils['id']", paymentID)
+            print("платеж")
+        
+        else:
+            print("платеж не прошел")
         await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     else:
         await bot.send_message(call.from_user.id, "Ошибка🤷‍♀️\n Возможно, оплата уже произведена.")
+
         
 
 @dp.pre_checkout_query_handler()
 async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery):
-    print("process_pre_chechout_query", pre_checkout_query)
+    print("process_pre_chechout_query \n", pre_checkout_query)
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok = True)
 
 
 @dp.message_handler(content_types=ContentTypes.SUCCESSFUL_PAYMENT)
 async def process_pay(message: types.Message):
     order_id = message.successful_payment.invoice_payload
-    print("message", message)
+    print("message \n", message)
     if db.order_exists(message.successful_payment.invoice_payload):
         # Уведомление об успешном платеже за заказ 
         if db.get_orderStatus(order_id) == "wait payment":
@@ -296,7 +363,7 @@ async def process_pay(message: types.Message):
             user_id = db.get_user_id_through_order_id(order_id)
             order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
             # remove inline buttons
-            print("db.get_message_id(order_id)", db.get_message_id(order_id))
+            # print("db.get_message_id(order_id)", db.get_message_id(order_id))
             await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
             await bot.send_message(message.from_user.id, "Платеж принят!")
             await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
