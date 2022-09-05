@@ -105,11 +105,11 @@ def check_payment(payment_id):
         # ///////await asyncio.sleep(3)
 
     if payment['status']=='succeeded':
-        print("SUCCSESS RETURN")
-        print(payment)
+        print("check_payment SUCCSESS RETURN")
+        print("√check_payment payment", payment)
         return True
     else:
-        print("BAD RETURN")
+        print("check_payment BAD RETURN")
         print(payment)
         return False
 
@@ -317,6 +317,7 @@ async def callback_inline(call: types.CallbackQuery):
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
         list = Webhook.list()
         print (list)
+        my_webhook_handler()
         print("payment_deatils", payment_deatils)
         if check_payment(payment_deatils['id']):
             print("check_payment") 
