@@ -13,6 +13,7 @@ import requests
 import xlsxwriter
 import uuid
 from yookassa import Configuration, Payment, Webhook, Settings
+import var_dump as var_dump
 
 import json
 from django.http import HttpResponse
@@ -60,6 +61,7 @@ print('res1', res1)
 
 list = Webhook.list()
 print("webhook list", list)
+var_dump.var_dump(Webhook.list())
 
 
 def my_webhook_handler(request):
