@@ -129,14 +129,14 @@ class handler(BaseHTTPRequestHandler):
 # print(payment)
 
 
-# httpd = HTTPServer(('', 443), handler)
-# httpd.socket = ssl.wrap_socket(
-#     httpd.socket, 
-#     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-#     keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
-#     ssl_version=ssl.PROTOCOL_TLS,
-#     server_side=True)
-# httpd.serve_forever()
+httpd = HTTPServer(('', 443), handler)
+httpd.socket = ssl.wrap_socket(
+    httpd.socket, 
+    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
+    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
+    ssl_version=ssl.PROTOCOL_TLS,
+    server_side=True)
+httpd.serve_forever()
 
 
 
@@ -574,14 +574,14 @@ async def callback_inline(call):
     except Exception as e:
         print(repr(e))
 
-httpd = HTTPServer(('', 443), handler)
-httpd.socket = ssl.wrap_socket(
-    httpd.socket, 
-    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
-    ssl_version=ssl.PROTOCOL_TLS,
-    server_side=True)
-httpd.serve_forever()
+# httpd = HTTPServer(('', 443), handler)
+# httpd.socket = ssl.wrap_socket(
+#     httpd.socket, 
+#     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
+#     keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
+#     ssl_version=ssl.PROTOCOL_TLS,
+#     server_side=True)
+# httpd.serve_forever()
 
 if __name__ =="__main__":
     executor.start_polling(dp,skip_updates = True)
