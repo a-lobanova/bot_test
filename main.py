@@ -52,6 +52,7 @@ print(settings)
 params = {'limit': 2}
 res1 = Payment.list(params)
 print('res1', res1)
+var_dump.var_dump(Payment.list(params))
 
 
 # response = Webhook.add({
@@ -79,80 +80,19 @@ from yookassa.domain.notification import WebhookNotificationEventType
 
 import os
 
-class handler(BaseHTTPRequestHandler):
-    print("line 9")
-    def do_GET(self):
-        print("do_GET")
-        self.send_response(200)
-        self.send_header('Content-type','application/json')
-        self.end_headers()
-        message = "Lobanova senior-pomidor!!!11"
-        self.wfile.write(bytes(message, "utf8"))
-
-    def do_POST(self):
-        print("do_POST")
-        self.send_response(200)
-        self.send_header('Content-type','application/json')
-        self.end_headers()
-        length = int(self.headers.get('content-length'))
-        message = json.loads(self.rfile.read(length))
-        self.wfile.write(bytes(json.dumps(message), "utf8"))
-        print (message)    
-
-    def my_webhook_handler(request):
-        print("my_webhook_handler(request):")
-        event_json = json.loads(request.body)
-        try:
-            # Создание объекта класса уведомлений в зависимости от события
-            notification_object = WebhookNotificationFactory().create(event_json)
-            response_object = notification_object.object
-            if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-                # Специфичная логика
-                # ...
-            elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-        except Exception:
-        # Обработка ошибок
-            print("# Сообщаем кассе об ошибке")
-            return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-        return HttpResponse(status=200)
-
-# # Получите объекта платежа
-# payment = notification_object.object 
-# print(payment)
-
-
-httpd = HTTPServer(('', 443), handler)
-httpd.socket = ssl.wrap_socket(
-    httpd.socket, 
-    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
-    ssl_version=ssl.PROTOCOL_TLS,
-    server_side=True)
-httpd.serve_forever()
-
-
-
-
 def my_webhook_handler(request):
+    print("my_webhook_handler")
     event_json = json.loads(request.body)
     return HttpResponse(status=200)
 
-# Cоздайте объект класса уведомлений в зависимости от события
-try:
-    notification_object = WebhookNotification(event_json)
-    payment = notification_object.object
-    print(payment)
-except Exception:
-    print(" # обработка ошибок error")
-    # обработка ошибок
+    # Cоздайте объект класса уведомлений в зависимости от события
+    try:
+        notification_object = WebhookNotification(event_json)
+        payment = notification_object.object
+        print(payment)
+    except Exception:
+        print(" # обработка ошибок error")
+        # обработка ошибок
 
 # # Получите объекта платежа
 # payment = notification_object.object
@@ -387,10 +327,11 @@ async def callback_inline(call: types.CallbackQuery):
     order_id = "".join(f)
     if db.get_orderStatus(order_id) == "wait payment":
         print("db.get_orderStatus(order_id) == wait payment")
-        amount = str(round(db.get_rubprice(order_id)))+"00"
+        # amount = str(round(db.get_rubprice(order_id)))+"00"
+        amount = str(round(db.get_rubprice(order_id)))
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
-        payment_deatils = payment(150, description)
+        payment_deatils = payment(amount, description)
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
         # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
@@ -405,7 +346,6 @@ async def callback_inline(call: types.CallbackQuery):
             print("платеж")
         else:
             print("платеж не прошел")
-        print("orderDesc", description)
     elif db.get_orderStatus(order_id) == "wait delivery payment":
         print("db.get_orderStatus(order_id) == wait delivery payment")
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
@@ -573,15 +513,6 @@ async def callback_inline(call):
      
     except Exception as e:
         print(repr(e))
-
-# httpd = HTTPServer(('', 443), handler)
-# httpd.socket = ssl.wrap_socket(
-#     httpd.socket, 
-#     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-#     keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
-#     ssl_version=ssl.PROTOCOL_TLS,
-#     server_side=True)
-# httpd.serve_forever()
 
 if __name__ =="__main__":
     executor.start_polling(dp,skip_updates = True)
