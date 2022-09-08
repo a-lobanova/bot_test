@@ -11,8 +11,15 @@ class Const:
     token = "5465368188:AAG83Mpit0wwk6CPMgYw_NSQXecSH6Arkyk"
     UKassaTestToken = "381764678:TEST:41073"
     adminId = 416370888
-    Configuration_account_id = "938290"
-    Configuration_secret_key = "test_h9Uetub9cianQpnen5Yxob262gKqaAVkeINXS1RaR1Y"
+    # shopId c сайта 
+    # Configuration_account_id = "938290"
+    # Configuration_secret_key = "test_h9Uetub9cianQpnen5Yxob262gKqaAVkeINXS1RaR1Y"
+    # access_token = "AAEACFlnACEqaQAAAYL6TQeFTRMkaNqO1xoMnqwXct-eUTOyRPhU-GG687jJMzpXmJNCJahdmOuoj7Iwqfhf1Zi4"
+
+    # shopId из телеги 
+    Configuration_account_id = "506751"
+    Configuration_secret_key = "test_*gjUm0LOFcj_firv8CK8cNIhI1zim91M27jPRtWGSSXTM"
+    
     access_token = "AAEACFlnACEqaQAAAYL6TQeFTRMkaNqO1xoMnqwXct-eUTOyRPhU-GG687jJMzpXmJNCJahdmOuoj7Iwqfhf1Zi4"
 
 
