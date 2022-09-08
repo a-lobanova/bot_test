@@ -580,8 +580,9 @@ async def callback_inline(call):
      
     except Exception as e:
         print(repr(e))
-
+def fanc():
+    executor.start_polling(dp, skip_updates=True)
 
 if __name__ =="__main__":
-    Process(target = executor.start_polling, args = (dp,))
+    Process(target = fanc)
     Process(target = httpd.serve_forever).start() 
