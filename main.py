@@ -584,5 +584,5 @@ def fanc():
     executor.start_polling(dp, skip_updates=True)
 
 if __name__ =="__main__":
-    Process(target = fanc)
+    Process(target = fanc).start()
     Process(target = httpd.serve_forever).start() 
