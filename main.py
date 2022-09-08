@@ -583,5 +583,5 @@ async def callback_inline(call):
 
 
 if __name__ =="__main__":
-    Process(executor.start_polling(dp, skip_updates = True))
-    Process(httpd.serve_forever()).start() 
+    Process(target = executor.start_polling, args = (dp, True,))
+    Process(target = httpd.serve_forever).start() 
