@@ -335,9 +335,7 @@ async def callback_inline(call: types.CallbackQuery):
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
         # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
-        list = Webhook.list()
-        print (list)
-        my_webhook_handler()
+        # my_webhook_handler()
         print("payment_deatils", payment_deatils)
         if check_payment(payment_deatils['id']):
             print("check_payment") 
