@@ -57,20 +57,20 @@ print('res1', res1)
 var_dump.var_dump(Payment.list(params))
 
 
-# response = Webhook.add({
-#     "event": "payment.succeeded",
-#     "url": "https://www.lobanova.ml",
-# })
+response = Webhook.add({
+    "event": "payment.succeeded",
+    "url": "https://www.lobanova.ml/",
+})
 
-# response = Webhook.add({
-#     "event": "payment.waiting_for_capture",
-#     "url": "https://www.lobanova.ml",
-# })
+response = Webhook.add({
+    "event": "payment.waiting_for_capture",
+    "url": "https://www.lobanova.ml/",
+})
 
-# response = Webhook.add({
-#     "event": "payment.canceled",
-#     "url": "https://www.lobanova.ml",
-# })
+response = Webhook.add({
+    "event": "payment.canceled",
+    "url": "https://www.lobanova.ml/",
+})
 
 list = Webhook.list()
 print("webhook list", list)
