@@ -59,17 +59,17 @@ var_dump.var_dump(Payment.list(params))
 
 response = Webhook.add({
     "event": "payment.succeeded",
-    "url": "https://www.lobanova.ml/",
+    "url": "https://lobanova.ml/payment/yookassa",
 })
 
 response = Webhook.add({
     "event": "payment.waiting_for_capture",
-    "url": "https://www.lobanova.ml/",
+    "url": "https://lobanova.ml/payment/yookassa",
 })
 
 response = Webhook.add({
     "event": "payment.canceled",
-    "url": "https://www.lobanova.ml/",
+    "url": "https://lobanova.ml/payment/yookassa",
 })
 
 list = Webhook.list()
