@@ -108,8 +108,18 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
-        self.wfile.write(bytes(json.dumps(message), "utf8"))
-        print (message)    
+        # self.wfile.write(bytes(json.dumps(message), "utf8"))
+        print (message) 
+
+    # def do_POST(self, request):
+    #     print("do_POST")
+    #     self.send_response(200)
+    #     self.send_header('Content-type','application/json')
+    #     self.end_headers()
+    #     length = int(self.headers.get('content-length'))
+    #     message = json.loads(self.rfile.read(length))
+    #     # self.wfile.write(bytes(json.dumps(message), "utf8"))
+    #     print (message)  
 
     def my_webhook_handler(self, request):
         print("my_webhook_handler(request):")
