@@ -95,12 +95,15 @@ class handler(BaseHTTPRequestHandler):
     print("class handler")
     def do_GET(self):
         try:
-            print("do_GET")
             self.send_response(200)
-            self.send_header('Content-type','text/html')
             self.end_headers()
-            message = "Lobanova senior-pomidor!!!11"
-            self.wfile.write(bytes(message, "utf8"))
+            self.wfile.write(b'Lobanova senior-pomidor!!!11')
+            # print("do_GET")
+            # self.send_response(200)
+            # self.send_header('Content-type','text/html')
+            # self.end_headers()
+            # message = "Lobanova senior-pomidor!!!11"
+            # self.wfile.write(bytes(message, "utf8"))
         except Exception as e:
             print("ошибки do_GET", repr(e))
 
