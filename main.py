@@ -121,6 +121,7 @@ class handler(BaseHTTPRequestHandler):
         body = self.rfile.read(content_length)
         self.send_response(200)
         self.end_headers()
+        print("body", body)
         # response = BytesIO()
         # response.write(b'This is POST request. ')
         # response.write(b'Received: ')
