@@ -101,7 +101,7 @@ class handler(BaseHTTPRequestHandler):
         message = "Lobanova senior-pomidor!!!11"
         self.wfile.write(bytes(message, "utf8"))
 
-    def do_POST(self, request):
+    def do_POST(self):
         print("do_POST")
         self.send_response(200)
         self.send_header('Content-type','application/json')
