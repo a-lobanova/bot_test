@@ -101,7 +101,7 @@ class handler(BaseHTTPRequestHandler):
         message = "Lobanova senior-pomidor!!!11"
         self.wfile.write(bytes(message, "utf8"))
 
-    def do_POST(self):
+    def do_POST(self, request):
         print("do_POST")
         self.send_response(200)
         self.send_header('Content-type','application/json')
@@ -111,7 +111,7 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(message), "utf8"))
         print (message)    
 
-    def my_webhook_handler(request):
+    def my_webhook_handler(self, request):
         print("my_webhook_handler(request):")
         event_json = json.loads(request.body)
         try:
