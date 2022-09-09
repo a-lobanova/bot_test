@@ -7,9 +7,10 @@ from flask import Flask, request
 import ssl
 import socket
 import certifi
-import var_dump as var_dump
+# import var_dump as var_dump
 from yookassa import Webhook
 from yookassa.domain.notification import WebhookNotificationEventType
+# from multiprocessing import Pool
 
 import os
 
@@ -18,7 +19,7 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         print("do_GET")
         self.send_response(200)
-        self.send_header('Content-type','application/json')
+        self.send_header('Content-type','text/html')
         self.end_headers()
         message = "Lobanova senior-pomidor!!!11"
         self.wfile.write(bytes(message, "utf8"))
@@ -30,7 +31,6 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
-        self.wfile.write(bytes(json.dumps(message), "utf8"))
         print (message)    
 
     def my_webhook_handler(request):

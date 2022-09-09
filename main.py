@@ -595,4 +595,4 @@ def fanc():
 
 if __name__ =="__main__":
     Process(target = fanc).start()
-    Process(target = httpd.serve_forever).start() 
+    # Process(target = httpd.serve_forever).start() 
