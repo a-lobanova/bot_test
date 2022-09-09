@@ -416,13 +416,13 @@ async def callback_inline(call: types.CallbackQuery):
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
         # my_webhook_handler()
         print("payment_deatils", payment_deatils)
-        if check_payment(payment_deatils['id']):
-            print("check_payment") 
-            paymentID = payment_deatils['id']
-            print("payment_deatils['id']", paymentID)
-            print("платеж")
-        else:
-            print("платеж не прошел")
+        # if check_payment(payment_deatils['id']):
+        #     print("check_payment") 
+        #     paymentID = payment_deatils['id']
+        #     print("payment_deatils['id']", paymentID)
+        #     print("платеж")
+        # else:
+        #     print("платеж не прошел")
     elif db.get_orderStatus(order_id) == "wait delivery payment":
         print("db.get_orderStatus(order_id) == wait delivery payment")
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
