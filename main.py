@@ -92,14 +92,17 @@ from yookassa.domain.notification import WebhookNotificationEventType
 import os
 
 class handler(BaseHTTPRequestHandler):
-    print("line 9")
+    print("class handler")
     def do_GET(self):
-        print("do_GET")
-        self.send_response(200)
-        self.send_header('Content-type','text/html')
-        self.end_headers()
-        message = "Lobanova senior-pomidor!!!11"
-        self.wfile.write(bytes(message, "utf8"))
+        try:
+            print("do_GET")
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            message = "Lobanova senior-pomidor!!!11"
+            self.wfile.write(bytes(message, "utf8"))
+        except Exception as e:
+            print("ошибки do_GET", repr(e))
 
     def do_POST(self):
         print("do_POST")
@@ -159,6 +162,7 @@ httpd.socket = ssl.wrap_socket(
     ssl_version=ssl.PROTOCOL_TLS,
     server_side=True)
 
+
 def my_webhook_handler(request):
     print("my_webhook_handler")
     event_json = json.loads(request.body)
@@ -176,7 +180,7 @@ def my_webhook_handler(request):
 # # Получите объекта платежа
 # payment = notification_object.object
 
-def payment(value,description):
+def payment(value, description):
     print("payment_def\n")
     payment = Payment.create({
     "amount": {
