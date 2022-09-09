@@ -57,24 +57,24 @@ print('res1', res1)
 var_dump.var_dump(Payment.list(params))
 
 
-response = Webhook.add({
-    "event": "payment.succeeded",
-    "url": "https://lobanova.ml/payment/yookassa",
-})
+# response = Webhook.add({
+#     "event": "payment.succeeded",
+#     "url": "https://lobanova.ml/payment/yookassa",
+# })
 
-response = Webhook.add({
-    "event": "payment.waiting_for_capture",
-    "url": "https://lobanova.ml/payment/yookassa",
-})
+# response = Webhook.add({
+#     "event": "payment.waiting_for_capture",
+#     "url": "https://lobanova.ml/payment/yookassa",
+# })
 
-response = Webhook.add({
-    "event": "payment.canceled",
-    "url": "https://lobanova.ml/payment/yookassa",
-})
+# response = Webhook.add({
+#     "event": "payment.canceled",
+#     "url": "https://lobanova.ml/payment/yookassa",
+# })
 
-list = Webhook.list()
-print("webhook list", list)
-var_dump.var_dump(Webhook.list())
+# list = Webhook.list()
+# print("webhook list", list)
+# var_dump.var_dump(Webhook.list())
 
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
