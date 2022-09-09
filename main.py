@@ -19,6 +19,7 @@ from multiprocessing import Process
 import json
 from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
+from io import BytesIO
 
 # from telebot import types
 
