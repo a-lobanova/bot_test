@@ -109,17 +109,13 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             print("ошибки do_GET", repr(e))
 
-    # def do_POST(self):
-    #     print("do_POST")
-    #     self.send_response(200)
-    #     self.send_header('Content-type','application/json')
-    #     self.end_headers()
-    #     length = int(self.headers.get('content-length'))
-    #     message = json.loads(self.rfile.read(length))
-    #     print (message)  
-
-    def my_webhook_handler(self, request):
-        print("my_webhook_handler(request):")
+    def do_POST(self):
+        print("do_POST")
+        self.send_response(200)
+        self.send_header('Content-type','application/json')
+        self.end_headers()
+        length = int(self.headers.get('content-length'))
+        message = json.loads(self.rfile.read(length))
         event_json = json.loads(request.body)
         try:
             # Создание объекта класса уведомлений в зависимости от события
@@ -143,7 +139,34 @@ class handler(BaseHTTPRequestHandler):
         # Обработка ошибок
             print("# Сообщаем кассе об ошибке")
             return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-        return HttpResponse(status=200)
+        print (message)  
+
+    # def my_webhook_handler(self, request):
+    #     print("my_webhook_handler(request):")
+    #     event_json = json.loads(request.body)
+    #     try:
+    #         # Создание объекта класса уведомлений в зависимости от события
+    #         notification_object = WebhookNotificationFactory().create(event_json)
+    #         response_object = notification_object.object
+    #         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
+    #             some_data = {
+    #                 'paymentId': response_object.id,
+    #                 'paymentStatus': response_object.status,
+    #             }
+    #             print('some_data',some_data)
+    #             # Специфичная логика
+    #             # ...
+    #         elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
+    #             some_data = {
+    #                 'paymentId': response_object.id,
+    #                 'paymentStatus': response_object.status,
+    #             }
+    #             print('some_data', some_data)
+    #     except Exception:
+    #     # Обработка ошибок
+    #         print("# Сообщаем кассе об ошибке")
+    #         return HttpResponse(status=400)  # Сообщаем кассе об ошибке
+    #     return HttpResponse(status=200)
 
 # # Получите объекта платежа
 # payment = notification_object.object 
