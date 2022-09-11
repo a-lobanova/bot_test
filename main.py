@@ -100,14 +100,8 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b'Lobanova senior-pomidor!!!11')
-
-            # self.send_response(200)
-            # self.send_header('Content-type','text/html')
-            # self.end_headers()
-            # message = "Lobanova senior-pomidor!!!11"
-            # self.wfile.write(bytes(message, "utf8"))
         except Exception as e:
-            print("ошибки do_GET", repr(e))
+            print("error do_GET", repr(e))
 
     def do_POST(self):
         print("do_POST")
@@ -116,7 +110,8 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
-        event_json = json.loads(request.body)
+        event_json = json.loads(self.rfile.read(length))
+        print("# Создание объекта класса уведомлений в зависимости от события")
         try:
             # Создание объекта класса уведомлений в зависимости от события
             notification_object = WebhookNotificationFactory().create(event_json)
