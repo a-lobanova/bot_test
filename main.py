@@ -111,9 +111,11 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
         print(message)
-        # event_json = json.loads(request.body)
+        event_json = json.loads(request.body)
         status = (message['event'])
+        order_id = (message['object']['description'])
         print("status",status)
+        print("ordee_id", order_id)
 
         try:
             # Создание объекта класса уведомлений в зависимости от события
@@ -412,7 +414,7 @@ async def callback_inline(call: types.CallbackQuery):
         # amount = str(round(db.get_rubprice(order_id)))+"00"
         amount = str(round(db.get_rubprice(order_id)))
         amountPrice = int(amount)
-        description = db.get_orderDesc(order_id)
+        description = ("Заказ №", order_id)
         payment_deatils = payment(amount, description)
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
         # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
