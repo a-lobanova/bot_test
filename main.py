@@ -130,6 +130,8 @@ class handler(BaseHTTPRequestHandler):
         f = filter(str.isdecimal, orderId)
         order_id = "".join(f)
         print("type(order_id)",type(order_id))
+        print("order_id_raw", order_id_raw)
+        print("order_id", order_id)
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
             if db.get_orderStatus(order_id) == "wait payment":
