@@ -109,34 +109,13 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             print("ошибки do_GET", repr(e))
 
-    def do_POST(self):
-        print("do_POST")
-        self.send_response(200)
-        self.send_header('Content-type','application/json')
-        self.end_headers()
-        length = int(self.headers.get('content-length'))
-        message = json.loads(self.rfile.read(length))
-        # self.wfile.write(bytes(json.dumps(message), "utf8"))
-        print (message) 
-        # content_length = int(self.headers['Content-Length'])
-        # body = self.rfile.read(content_length)
-        # self.send_response(200)
-        # self.end_headers()
-        # print("body", body)
-        # response = BytesIO()
-        # response.write(b'This is POST request. ')
-        # response.write(b'Received: ')
-        # response.write(body)
-        # self.wfile.write(response.getvalue())
-
-    # def do_POST(self, request):
+    # def do_POST(self):
     #     print("do_POST")
     #     self.send_response(200)
     #     self.send_header('Content-type','application/json')
     #     self.end_headers()
     #     length = int(self.headers.get('content-length'))
     #     message = json.loads(self.rfile.read(length))
-    #     # self.wfile.write(bytes(json.dumps(message), "utf8"))
     #     print (message)  
 
     def my_webhook_handler(self, request):
@@ -151,6 +130,7 @@ class handler(BaseHTTPRequestHandler):
                     'paymentId': response_object.id,
                     'paymentStatus': response_object.status,
                 }
+                print('some_data',some_data)
                 # Специфичная логика
                 # ...
             elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
@@ -158,6 +138,7 @@ class handler(BaseHTTPRequestHandler):
                     'paymentId': response_object.id,
                     'paymentStatus': response_object.status,
                 }
+                print('some_data', some_data)
         except Exception:
         # Обработка ошибок
             print("# Сообщаем кассе об ошибке")
