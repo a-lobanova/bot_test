@@ -125,8 +125,11 @@ class handler(BaseHTTPRequestHandler):
         order_id_raw = (message['object']['description'])
         print("type(order_id_raw)",type(order_id_raw))
         print("status",status)
-        print("ordee_id", order_id_raw)
-        order_id = orderIdFromMessegeUKassa(order_id_raw)
+        print("order_id_raw", order_id_raw)
+        order_id = str(orderIdFromMessegeUKassa(order_id_raw))
+        f = filter(str.isdecimal, orderId)
+        order_id = "".join(f)
+        print("type(order_id)",type(order_id))
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
             if db.get_orderStatus(order_id) == "wait payment":
