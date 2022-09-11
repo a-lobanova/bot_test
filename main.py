@@ -112,7 +112,7 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             print("error do_GET", repr(e))
 
-    async def do_POST(self):
+    def do_POST(self):
         print("do_POST")
         self.send_response(200)
         self.send_header('Content-type','application/json')
@@ -151,9 +151,6 @@ class handler(BaseHTTPRequestHandler):
                 # await bot.send_message(message.from_user.id, "Платеж за доставку принят!")
                 # await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id))
 
-    def SendAsync(self):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.Send())
 
 httpd = HTTPServer(('', 443), handler)
 httpd.socket = ssl.wrap_socket(
