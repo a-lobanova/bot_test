@@ -112,8 +112,8 @@ class handler(BaseHTTPRequestHandler):
         message = json.loads(self.rfile.read(length))
         print(message)
         # event_json = json.loads(request.body)
-        event_json = json.loads(self.rfile.read(length))
-        # status = (event_json['payload']['rates'][72]['sell'])
+        status = (message['event'])
+        print("status",status)
 
         try:
             # Создание объекта класса уведомлений в зависимости от события
