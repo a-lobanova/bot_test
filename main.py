@@ -117,29 +117,29 @@ class handler(BaseHTTPRequestHandler):
         print("status",status)
         print("ordee_id", order_id)
 
-        try:
-            # Создание объекта класса уведомлений в зависимости от события
-            notification_object = WebhookNotificationFactory().create(event_json)
-            response_object = notification_object.object
-            if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-                print('some_data',some_data)
-                # Специфичная логика
-                # ...
-            elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-                print('some_data', some_data)
-        except Exception:
-        # Обработка ошибок
-            print("# Сообщаем кассе об ошибке")
-            return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-        print (message)  
+        # try:
+        #     # Создание объекта класса уведомлений в зависимости от события
+        #     notification_object = WebhookNotificationFactory().create(event_json)
+        #     response_object = notification_object.object
+        #     if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
+        #         some_data = {
+        #             'paymentId': response_object.id,
+        #             'paymentStatus': response_object.status,
+        #         }
+        #         print('some_data',some_data)
+        #         # Специфичная логика
+        #         # ...
+        #     elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
+        #         some_data = {
+        #             'paymentId': response_object.id,
+        #             'paymentStatus': response_object.status,
+        #         }
+        #         print('some_data', some_data)
+        # except Exception:
+        # # Обработка ошибок
+        #     print("# Сообщаем кассе об ошибке")
+        #     return HttpResponse(status=400)  # Сообщаем кассе об ошибке
+        # print (message)  
 
     # def my_webhook_handler(self, request):
     #     print("my_webhook_handler(request):")
