@@ -92,6 +92,13 @@ from yookassa.domain.notification import WebhookNotificationEventType
 
 import os
 
+def orderIdFromMessegeUKassa(text):
+    s = text
+    result = re.findall("Заказ № \d+", s)
+    mystr = ' '.join(map(str,result))
+    number_result = [int(number_result) for number_result in str.split(mystr) if number_result.isdigit()]
+    return(number_result)
+
 class handler(BaseHTTPRequestHandler):
     print("class handler")
     def do_GET(self):
@@ -113,65 +120,33 @@ class handler(BaseHTTPRequestHandler):
         print(message)
         # event_json = json.loads(request.body)
         status = (message['event'])
-        order_id = (message['object']['description'])
+        order_id_raw = (message['object']['description'])
+        print("type(order_id_raw)",type(order_id_raw))
         print("status",status)
-        print("ordee_id", order_id)
-
-        # try:
-        #     # Создание объекта класса уведомлений в зависимости от события
-        #     notification_object = WebhookNotificationFactory().create(event_json)
-        #     response_object = notification_object.object
-        #     if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
-        #         some_data = {
-        #             'paymentId': response_object.id,
-        #             'paymentStatus': response_object.status,
-        #         }
-        #         print('some_data',some_data)
-        #         # Специфичная логика
-        #         # ...
-        #     elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-        #         some_data = {
-        #             'paymentId': response_object.id,
-        #             'paymentStatus': response_object.status,
-        #         }
-        #         print('some_data', some_data)
-        # except Exception:
-        # # Обработка ошибок
-        #     print("# Сообщаем кассе об ошибке")
-        #     return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-        # print (message)  
-
-    # def my_webhook_handler(self, request):
-    #     print("my_webhook_handler(request):")
-    #     event_json = json.loads(request.body)
-    #     try:
-    #         # Создание объекта класса уведомлений в зависимости от события
-    #         notification_object = WebhookNotificationFactory().create(event_json)
-    #         response_object = notification_object.object
-    #         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
-    #             some_data = {
-    #                 'paymentId': response_object.id,
-    #                 'paymentStatus': response_object.status,
-    #             }
-    #             print('some_data',some_data)
-    #             # Специфичная логика
-    #             # ...
-    #         elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-    #             some_data = {
-    #                 'paymentId': response_object.id,
-    #                 'paymentStatus': response_object.status,
-    #             }
-    #             print('some_data', some_data)
-    #     except Exception:
-    #     # Обработка ошибок
-    #         print("# Сообщаем кассе об ошибке")
-    #         return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-    #     return HttpResponse(status=200)
-
-# # Получите объекта платежа
-# payment = notification_object.object 
-# print(payment)
-
+        print("ordee_id", order_id_raw)
+        order_id = orderIdFromMessegeUKassa(order_id_raw)
+        if status == "payment.succeeded":
+            # Уведомление об успешном платеже за заказ 
+            if db.get_orderStatus(order_id) == "wait payment":
+                db.set_orderStatus(order_id, "complitedPayment")
+                db.set_update(order_id) 
+                user_id = db.get_user_id_through_order_id(order_id)
+                order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
+                # remove inline buttons
+                # print("db.get_message_id(order_id)", db.get_message_id(order_id))
+                await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
+                await bot.send_message(message.from_user.id, "Платеж принят!")
+                await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
+            # Уведомление об успешном платеже за Доставку 
+            elif db.get_orderStatus(order_id) == "wait delivery payment":
+                db.set_orderStatus(order_id, "paidOrderDelivery")
+                db.set_update(order_id) 
+                user_id = db.get_user_id_through_order_id(order_id)
+                order_inform = "Доставка оплачена через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_delivery_paid_order_through_order_id(order_id)  
+                    # remove inline buttons
+                await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за ДОСТАВКУ заказа #" + order_id)
+                await bot.send_message(message.from_user.id, "Платеж за доставку принят!")
+                await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id))
 
 httpd = HTTPServer(('', 443), handler)
 httpd.socket = ssl.wrap_socket(
@@ -200,21 +175,6 @@ def payment(value, description):
     }, uuid.uuid4())
 
     return json.loads(payment.json())
-
-def check_payment(payment_id):
-    payment = json.loads((Payment.find_one(payment_id)).json())
-    while payment['status'] == 'pending':
-        payment = json.loads((Payment.find_one(payment_id)).json())
-        # ///////await asyncio.sleep(3)
-
-    if payment['status']=='succeeded':
-        print("check_payment SUCCSESS RETURN")
-        print("√check_payment payment", payment)
-        return True
-    else:
-        print("check_payment BAD RETURN")
-        print(payment)
-        return False
 
 def dataOutput(records, text):
     answer = f"Все заказы за промежуток времени - {text}\n"
@@ -419,29 +379,13 @@ async def callback_inline(call: types.CallbackQuery):
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
         # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
-        # my_webhook_handler()
         print("payment_deatils", payment_deatils)
-        # if check_payment(payment_deatils['id']):
-        #     print("check_payment") 
-        #     paymentID = payment_deatils['id']
-        #     print("payment_deatils['id']", paymentID)
-        #     print("платеж")
-        # else:
-        #     print("платеж не прошел")
+
     elif db.get_orderStatus(order_id) == "wait delivery payment":
         print("db.get_orderStatus(order_id) == wait delivery payment")
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
-        # payment_deatils = payment(amountPrice, description)
-        # if await check_payment(payment_deatils['id']):
-        #     print("check_payment") 
-        #     paymentID = payment_deatils['id']
-        #     print("payment_deatils['id']", paymentID)
-        #     print("платеж")
-        
-        # else:
-        #     print("платеж не прошел")
         await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
             currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     else:
