@@ -124,13 +124,12 @@ class handler(BaseHTTPRequestHandler):
         status = (message['event'])
         order_id_raw = (message['object']['description'])
         print("type(order_id_raw)",type(order_id_raw))
-        print("status",status)
-        print("order_id_raw", order_id_raw)
         orderId = str(orderIdFromMessegeUKassa(order_id_raw))
+        print("orderId", orderId)
+        print("type(orderId)", type(orderId))
         f = filter(str.isdecimal, orderId)
         order_id = "".join(f)
         print("type(order_id)",type(order_id))
-        print("order_id_raw", order_id_raw)
         print("order_id", order_id)
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
