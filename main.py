@@ -94,14 +94,6 @@ from yookassa.domain.notification import WebhookNotificationEventType
 
 import os
 
-def orderIdFromMessegeUKassa(text):
-    s = text
-    result = re.findall("Заказ № \d+", s)
-    mystr = ' '.join(map(str,result))
-    number_result = [int(number_result) for number_result in str.split(mystr) if number_result.isdigit()]
-    print('orderIdFromMessegeUKassa', number_result)
-    return(number_result)
-
 class handler(BaseHTTPRequestHandler):
     print("class handler")
     def do_GET(self):
@@ -124,14 +116,8 @@ class handler(BaseHTTPRequestHandler):
         # event_json = json.loads(request.body)
         status = (message['event'])
         order_id_raw = (message['object']['description'])
-        print("type(order_id_raw)",type(order_id_raw))
-        print("order_id_raw", order_id_raw)
-        test_number = orderIdFromMessegeUKassa(order_id_raw)
-        print("test_number",test_number)
         f = filter(str.isdecimal, order_id_raw)
         order_id = "".join(f)
-        print("type(order_id)",type(order_id))
-        print("order_id", order_id)
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
             if db.get_orderStatus(order_id) == "wait payment":
