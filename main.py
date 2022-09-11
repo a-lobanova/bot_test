@@ -111,7 +111,7 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
         print(message)
-        event_json = json.loads(request.body)
+        # event_json = json.loads(request.body)
         status = (message['event'])
         order_id = (message['object']['description'])
         print("status",status)
