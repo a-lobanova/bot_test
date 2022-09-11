@@ -376,6 +376,7 @@ async def callback_inline(call: types.CallbackQuery):
     orderId = str(orderIdFromMessege(call.message.text))
     f = filter(str.isdecimal, orderId)
     order_id = "".join(f)
+    print("UKassa type(order_id)",type(order_id))
     if db.get_orderStatus(order_id) == "wait payment":
         print("db.get_orderStatus(order_id) == wait payment")
         # amount = str(round(db.get_rubprice(order_id)))+"00"
