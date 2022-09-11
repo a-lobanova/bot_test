@@ -148,6 +148,10 @@ class handler(BaseHTTPRequestHandler):
                 await bot.send_message(message.from_user.id, "Платеж за доставку принят!")
                 await bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id))
 
+    def SendAsync(self):
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.Send())
+
 httpd = HTTPServer(('', 443), handler)
 httpd.socket = ssl.wrap_socket(
     httpd.socket, 
