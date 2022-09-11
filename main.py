@@ -51,10 +51,10 @@ Configuration.configure_auth_token(const.access_token)
 settings = Settings.get_account_settings()
 print(settings)
 
-params = {'limit': 2}
-res1 = Payment.list(params)
-print('res1', res1)
-var_dump.var_dump(Payment.list(params))
+# params = {'limit': 2}
+# res1 = Payment.list(params)
+# print('res1', res1)
+# var_dump.var_dump(Payment.list(params))
 
 
 # response = Webhook.add({
@@ -110,8 +110,11 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         length = int(self.headers.get('content-length'))
         message = json.loads(self.rfile.read(length))
+        print(message)
+        # event_json = json.loads(request.body)
         event_json = json.loads(self.rfile.read(length))
-        print("# Создание объекта класса уведомлений в зависимости от события")
+        # status = (event_json['payload']['rates'][72]['sell'])
+
         try:
             # Создание объекта класса уведомлений в зависимости от события
             notification_object = WebhookNotificationFactory().create(event_json)
@@ -175,24 +178,6 @@ httpd.socket = ssl.wrap_socket(
     keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
     ssl_version=ssl.PROTOCOL_TLS,
     server_side=True)
-
-
-def my_webhook_handler(request):
-    print("my_webhook_handler")
-    event_json = json.loads(request.body)
-    return HttpResponse(status=200)
-
-    # Cоздайте объект класса уведомлений в зависимости от события
-    try:
-        notification_object = WebhookNotification(event_json)
-        payment = notification_object.object
-        print(payment)
-    except Exception:
-        print(" # обработка ошибок error")
-        # обработка ошибок
-
-# # Получите объекта платежа
-# payment = notification_object.object
 
 def payment(value, description):
     print("payment_def\n")
