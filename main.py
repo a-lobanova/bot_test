@@ -126,7 +126,7 @@ class handler(BaseHTTPRequestHandler):
         print("type(order_id_raw)",type(order_id_raw))
         print("status",status)
         print("order_id_raw", order_id_raw)
-        order_id = str(orderIdFromMessegeUKassa(order_id_raw))
+        orderId = str(orderIdFromMessegeUKassa(order_id_raw))
         f = filter(str.isdecimal, orderId)
         order_id = "".join(f)
         print("type(order_id)",type(order_id))
