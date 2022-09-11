@@ -99,6 +99,7 @@ def orderIdFromMessegeUKassa(text):
     result = re.findall("Заказ № \d+", s)
     mystr = ' '.join(map(str,result))
     number_result = [int(number_result) for number_result in str.split(mystr) if number_result.isdigit()]
+    print('orderIdFromMessegeUKassa', number_result)
     return(number_result)
 
 class handler(BaseHTTPRequestHandler):
@@ -125,9 +126,9 @@ class handler(BaseHTTPRequestHandler):
         order_id_raw = (message['object']['description'])
         print("type(order_id_raw)",type(order_id_raw))
         print("order_id_raw", order_id_raw)
-        orderId = orderIdFromMessegeUKassa(order_id_raw)
-        print("orderId", orderId)
-        f = filter(str.isdecimal, orderId)
+        test_number = orderIdFromMessegeUKassa(order_id_raw)
+        print("test_number",test_number)
+        f = filter(str.isdecimal, order_id_raw)
         order_id = "".join(f)
         print("type(order_id)",type(order_id))
         print("order_id", order_id)
