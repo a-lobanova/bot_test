@@ -110,7 +110,7 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             print("error do_GET", repr(e))
 
-    def do_POST(self):
+    async def do_POST(self):
         print("do_POST")
         self.send_response(200)
         self.send_header('Content-type','application/json')
