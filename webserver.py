@@ -33,33 +33,33 @@ class handler(BaseHTTPRequestHandler):
         message = json.loads(self.rfile.read(length))
         print (message)    
 
-    def my_webhook_handler(request):
-        print("my_webhook_handler(request):")
-        event_json = json.loads(request.body)
-        try:
-            # Создание объекта класса уведомлений в зависимости от события
-            notification_object = WebhookNotificationFactory().create(event_json)
-            response_object = notification_object.object
-            if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-                # Специфичная логика
-                # ...
-            elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
-                some_data = {
-                    'paymentId': response_object.id,
-                    'paymentStatus': response_object.status,
-                }
-        except Exception:
-        # Обработка ошибок
-            print("# Сообщаем кассе об ошибке")
-            return HttpResponse(status=400)  # Сообщаем кассе об ошибке
-        return HttpResponse(status=200)
+    # def my_webhook_handler(request):
+    #     print("my_webhook_handler(request):")
+    #     event_json = json.loads(request.body)
+    #     try:
+    #         # Создание объекта класса уведомлений в зависимости от события
+    #         notification_object = WebhookNotificationFactory().create(event_json)
+    #         response_object = notification_object.object
+    #         if notification_object.event == WebhookNotificationEventType.PAYMENT_SUCCEEDED:
+    #             some_data = {
+    #                 'paymentId': response_object.id,
+    #                 'paymentStatus': response_object.status,
+    #             }
+    #             # Специфичная логика
+    #             # ...
+    #         elif notification_object.event == WebhookNotificationEventType.PAYMENT_WAITING_FOR_CAPTURE:
+    #             some_data = {
+    #                 'paymentId': response_object.id,
+    #                 'paymentStatus': response_object.status,
+    #             }
+    #     except Exception:
+    #     # Обработка ошибок
+    #         print("# Сообщаем кассе об ошибке")
+    #         return HttpResponse(status=400)  # Сообщаем кассе об ошибке
+    #     return HttpResponse(status=200)
 
 
-httpd = HTTPServer(('', 443), handler)
+httpd = HTTPServer(('', 5000), handler)
 # httpd.socket = ssl.wrap_socket(
 #     httpd.socket, 
 #     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
