@@ -58,17 +58,13 @@ class handler(BaseHTTPRequestHandler):
             return HttpResponse(status=400)  # Сообщаем кассе об ошибке
         return HttpResponse(status=200)
 
-# # Получите объекта платежа
-# payment = notification_object.object 
-# print(payment)
-
 
 httpd = HTTPServer(('', 443), handler)
-httpd.socket = ssl.wrap_socket(
-    httpd.socket, 
-    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
-    ssl_version=ssl.PROTOCOL_TLS,
-    server_side=True)
+# httpd.socket = ssl.wrap_socket(
+#     httpd.socket, 
+#     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
+#     keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
+#     ssl_version=ssl.PROTOCOL_TLS,
+#     server_side=True)
 httpd.serve_forever()
 
