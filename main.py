@@ -311,7 +311,7 @@ async def bot_message(message: types.Message):
                     row = 1
                     col = 0
                     answer = dataOutput(records, message.text)
-                    workbook = xlsxwriter.Workbook('/bot_test/Report.xlsx')
+                    workbook = xlsxwriter.Workbook('Report.xlsx')
                     worksheet = workbook.add_worksheet()
                     for r in records:
                         worksheet.write('A1', 'Номер заказа')
