@@ -214,7 +214,7 @@ class Database:
 		with self.connection:
 			result = self.cursor.execute("SELECT * FROM orders ORDER BY 'date'").fetchall()
 			return result
-	def get_all_orders_in_time(self, within = "all"):
+	def get_all_orders_in_time(self, within = const.allTime):
 		with self.connection:
 			if (within == const.day):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', 'start of day') AND datetime('now', 'localtime') ORDER BY 'date'").fetchall()

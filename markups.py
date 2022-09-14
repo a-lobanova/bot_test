@@ -3,9 +3,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 from const import Const
 const = Const
 
-btnProfile = KeyboardButton ('Профиль/Мои заказы')
-btnOrder = KeyboardButton ('Создать заказ')
-bthAllOrders = KeyboardButton ('Все заказы')
+btnProfile = KeyboardButton (const.myOrders)
+btnOrder = KeyboardButton (const.myOrders)
+bthAllOrders = KeyboardButton (const.allOrders)
 
 btnGetContact = KeyboardButton('Отправить свой номер', request_contact = True)
 
@@ -66,7 +66,7 @@ def allOrdersMarkup():
 	item2 = KeyboardButton (const.week)
 	item3 = KeyboardButton (const.twoWeeks)
 	item4 = KeyboardButton (const.month)
-	item5 = KeyboardButton ('Все время')
+	item5 = KeyboardButton (const.allTime)
 	item6 = KeyboardButton ('❌ Отмена')
 	allOrders.add(item1, item2, item3, item4, item5, item6)
 	return allOrders
