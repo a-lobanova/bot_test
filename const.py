@@ -1,5 +1,5 @@
 class Const:
 	day = "День"
 	week = "Неделя"
-	2weeks = "Две недели"
+	twoWeeks = "Две недели"
 	month = "Месяц"

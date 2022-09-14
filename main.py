@@ -297,9 +297,9 @@ async def bot_message(message: types.Message):
             answer = report(const.week)[0]
             markup = report(const.week)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
-        elif message.text == const.2weeks:
-            answer = report(const.2weeks)[0]
-            markup = report(const.2weeks)[1]
+        elif message.text == const.twoWeeks:
+            answer = report(const.twoWeeks)[0]
+            markup = report(const.twoWeeks)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == const.month:
             answer = report(const.month)[0]

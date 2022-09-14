@@ -220,7 +220,7 @@ class Database:
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', 'start of day') AND datetime('now', 'localtime') ORDER BY 'date'").fetchall()
 			elif (within == const.week):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime') ORDER BY date").fetchall()
-			elif (within == const.2weeks):
+			elif (within == const.twoWeeks):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', '-13 days') AND datetime('now', 'localtime') ORDER BY date").fetchall()
 			elif (within == const.month):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', 'start of month') AND datetime('now', 'localtime') ORDER BY date").fetchall()

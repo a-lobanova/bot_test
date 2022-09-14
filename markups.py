@@ -64,7 +64,7 @@ def allOrdersMarkup():
 	allOrders = ReplyKeyboardMarkup(resize_keyboard = True)
 	item1 = KeyboardButton (const.day)
 	item2 = KeyboardButton (const.week)
-	item3 = KeyboardButton (const.2weeks)
+	item3 = KeyboardButton (const.twoWeeks)
 	item4 = KeyboardButton (const.month)
 	item5 = KeyboardButton ('Все время')
 	item6 = KeyboardButton ('❌ Отмена')
