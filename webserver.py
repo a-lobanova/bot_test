@@ -59,7 +59,7 @@ class handler(BaseHTTPRequestHandler):
     #     return HttpResponse(status=200)
 
 
-httpd = HTTPServer(('', 5000), handler)
+httpd = HTTPServer(('', 443), handler)
 # httpd.socket = ssl.wrap_socket(
 #     httpd.socket, 
 #     certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
