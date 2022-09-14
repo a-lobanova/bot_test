@@ -1,4 +1,6 @@
 import sqlite3
+from const import Const
+const = Const
 
 class Database:
 	def __init__(self, db_file):
@@ -201,38 +203,26 @@ class Database:
 
 	def get_lastOrder_id(self, user_id):
 			with self.connection:
-				# print(f'get_orders, userId = {user_id}')
-				# result = self.cursor.execute("SELECT * FROM orders WHERE user_id = ? ORDER BY order_id DESC LIMIT 1", (user_id,)).fetchall()
-				# return str(result[0][0])
 				result = self.cursor.execute("SELECT * FROM orders WHERE user_id = ? ORDER BY order_id DESC LIMIT 1", (user_id,))
 				return result.fetchone()[0]
 
 	def get_orders(self, user_id):
 		with self.connection:
-			# print(f'get_orders, userId = {user_id}')
 			result = self.cursor.execute("SELECT * FROM orders WHERE user_id = ? ORDER BY 'date'", (user_id,)).fetchall()
-			# for row in result:
-			# 	orders = str(row[2])
-			# return orders
 			return result
 	def get_all_orders(self):
 		with self.connection:
-			# print(f'get_orders, userId = {user_id}')
 			result = self.cursor.execute("SELECT * FROM orders ORDER BY 'date'").fetchall()
-			# for row in result:
-			# 	orders = str(row[2])
-			# return orders
 			return result
 	def get_all_orders_in_time(self, within = "all"):
 		with self.connection:
-			# print(f'get_orders, userId = {user_id}')
-			if (within == "day"):
+			if (within == const.day):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', 'start of day') AND datetime('now', 'localtime') ORDER BY 'date'").fetchall()
-			elif (within == "week"):
+			elif (within == const.week):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime') ORDER BY date").fetchall()
-			elif (within == "2weeks"):
+			elif (within == const.2weeks):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', '-13 days') AND datetime('now', 'localtime') ORDER BY date").fetchall()
-			elif (within == "month"):
+			elif (within == const.month):
 				result = self.cursor.execute("SELECT * FROM orders WHERE date BETWEEN datetime('now', 'start of month') AND datetime('now', 'localtime') ORDER BY date").fetchall()
 			else:	
 				result = self.cursor.execute("SELECT * FROM orders ORDER BY 'date'").fetchall()
@@ -252,8 +242,6 @@ class Database:
 			return result
 
 	def delete_order(self, order_id):
-		print("delete_order")
-		print("order_id", order_id)
 		with self.connection:
 			return self.cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id))
 		self.connection.commit()

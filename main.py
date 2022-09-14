@@ -8,12 +8,12 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.message import ContentTypes
 import markups as nav
 from db import Database
+from config import Config
 from const import Const
 # import error_handler
 
-# from yookassa import Payment
 import requests
-# import pandas as pd
+
 import xlsxwriter
 import uuid
 from yookassa import Configuration, Payment, Webhook, Settings
@@ -23,21 +23,20 @@ from multiprocessing import Process
 import json
 from django.http import HttpResponse
 from yookassa.domain.notification import WebhookNotification
-import tracemalloc
+# import tracemalloc
 
-tracemalloc.start()
+# tracemalloc.start()
 
-# from telebot import types
 
+config = Config
 const = Const
 
 # data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
-# https://www.tinkoff.ru/api/v1/currency_rates/
 data = requests.get('https://www.tinkoff.ru/api/v1/currency_rates/').json()
 rate = (data['payload']['rates'][72]['sell'])
 print(rate)
 
-TOKEN = const.token
+TOKEN = config.token
     
 logging.basicConfig(level = logging.INFO)
 
@@ -47,12 +46,12 @@ dp = Dispatcher(bot)
 
 db = Database('database.db')
 
-adminId = const.adminId
+adminId = config.adminId
 
-Configuration.account_id = const.Configuration_account_id
-Configuration.secret_key = const.Configuration_secret_key
+Configuration.account_id = config.Configuration_account_id
+Configuration.secret_key = config.Configuration_secret_key
 
-Configuration.configure_auth_token(const.access_token)
+Configuration.configure_auth_token(config.access_token)
 
 settings = Settings.get_account_settings()
 print(settings)
@@ -85,17 +84,10 @@ print(settings)
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import requests
 from django.http import HttpResponse
-from yookassa.domain.notification import WebhookNotification
-from flask import Flask, request
 import ssl
 import socket
 import certifi
-# import var_dump as var_dump
-from yookassa import Webhook
-from yookassa.domain.notification import WebhookNotificationEventType
-
 import os
 
 class handler(BaseHTTPRequestHandler):
@@ -124,13 +116,12 @@ class handler(BaseHTTPRequestHandler):
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
             if db.get_orderStatus(order_id) == "wait payment":
-                # db.set_orderStatus(order_id, "complitedPayment")
+                db.set_orderStatus(order_id, "complitedPayment")
                 db.set_update(order_id) 
                 user_id = db.get_user_id_through_order_id(order_id)
                 order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
                 print(order_inform)
                 # remove inline buttons
-                # print("db.get_message_id(order_id)", db.get_message_id(order_id))
                 asyncio.run(bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), 
                     text = "Получена оплата за заказ #" + order_id))
                 asyncio.run(bot.send_message(user_id, "Платеж принят!"))
@@ -144,7 +135,7 @@ class handler(BaseHTTPRequestHandler):
                     # remove inline buttons
                 asyncio.run(bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), 
                     text = "Получена оплата за ДОСТАВКУ заказа #" + order_id))
-                asyncio.run(bot.send_message(message.from_user.id, "Платеж за доставку принят!"))
+                asyncio.run(bot.send_message(user_id, "Платеж за доставку принят!"))
                 asyncio.run(bot.send_message(adminId, order_inform, reply_markup=nav.sentOrderMurkup(order_id)))
 
 
@@ -157,7 +148,6 @@ httpd.socket = ssl.wrap_socket(
     server_side=True)
 
 def payment(value, description):
-    print("payment_def\n")
     payment = Payment.create({
     "amount": {
         "value": value,
@@ -299,21 +289,21 @@ async def bot_message(message: types.Message):
 
         elif message.text == 'Все заказы':
                 await bot.send_message(adminId, "Выберите интервал времени", reply_markup = nav.allOrdersMarkup())
-        elif message.text == "День":
-            answer = report("day")[0]
-            markup = report("day")[1]
+        elif message.text == const.day:
+            answer = report(const.day)[0]
+            markup = report(const.day)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
-        elif message.text == "Неделя":
-            answer = report("week")[0]
-            markup = report("week")[1]
+        elif message.text == const.week:
+            answer = report(const.week)[0]
+            markup = report(const.week)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
-        elif message.text == "Две недели":
-            answer = report("2weeks")[0]
-            markup = report("2weeks")[1]
+        elif message.text == const.2weeks:
+            answer = report(const.2weeks)[0]
+            markup = report(const.2weeks)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
-        elif message.text == "Месяц":
-            answer = report("month")[0]
-            markup = report("month")[1]
+        elif message.text == const.month:
+            answer = report(const.month)[0]
+            markup = report(const.month)[1]
             await bot.send_message(adminId, answer, reply_markup = markup)
         elif message.text == "Все время":
                 records = db.get_all_orders_in_time("all")
@@ -321,7 +311,7 @@ async def bot_message(message: types.Message):
                     row = 1
                     col = 0
                     answer = dataOutput(records, message.text)
-                    workbook = xlsxwriter.Workbook('/Users/nastya/Desktop/telegram_bot_test/Report.xlsx')
+                    workbook = xlsxwriter.Workbook('/bot_test/Report.xlsx')
                     worksheet = workbook.add_worksheet()
                     for r in records:
                         worksheet.write('A1', 'Номер заказа')
@@ -361,7 +351,7 @@ async def bot_contact (message):
 
 @dp.callback_query_handler(text = "bankDetails")
 async def callback_inline(call: types.CallbackQuery):
-    await bot.send_message(call.message.chat.id, const.bank_details)
+    await bot.send_message(call.message.chat.id, config.bank_details)
     await bot.send_photo(call.message.chat.id, photo=open('static/qr.jpg', 'rb'))
 
 @dp.callback_query_handler(text = "UKassa")
@@ -378,7 +368,7 @@ async def callback_inline(call: types.CallbackQuery):
         description = ("Заказ №", order_id)
         payment_deatils = payment(amount, description)
         await bot.send_message(chat_id = call.from_user.id, text = (payment_deatils['confirmation'])['confirmation_url'] )
-        # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
+        # await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата заказа #" + order_id, description = description, payload = order_id, provider_token = config.UKassaTestToken,
             # currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
         print("payment_deatils", payment_deatils)
 
@@ -387,12 +377,10 @@ async def callback_inline(call: types.CallbackQuery):
         amount = str(round(db.get_deliveryrubprice(order_id)))+"00"
         amountPrice = int(amount)
         description = db.get_orderDesc(order_id)
-        await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = const.UKassaTestToken,
+        await bot.send_invoice(chat_id = call.from_user.id, title = "Оплата ДОСТАВКИ заказа #" + order_id, description = description, payload = order_id, provider_token = config.UKassaTestToken,
             currency = "RUB", start_parameter = "test_bot", prices=[{"label":"Руб", "amount": amountPrice}])
     else:
-        await bot.send_message(call.from_user.id, "Ошибка🤷‍♀️\n Возможно, оплата уже произведена.")
-
-        
+        await bot.send_message(call.from_user.id, "Ошибка🤷‍♀️\n Возможно, оплата уже произведена.")       
 
 # @dp.pre_checkout_query_handler()
 # async def process_pre_chechout_query(pre_checkout_query: types.PreCheckoutQuery):

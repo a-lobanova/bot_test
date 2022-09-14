@@ -1,5 +1,8 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
+from const import Const
+const = Const
+
 btnProfile = KeyboardButton ('Профиль/Мои заказы')
 btnOrder = KeyboardButton ('Создать заказ')
 bthAllOrders = KeyboardButton ('Все заказы')
@@ -59,10 +62,10 @@ def sentOrderMurkup(data):
 
 def allOrdersMarkup():
 	allOrders = ReplyKeyboardMarkup(resize_keyboard = True)
-	item1 = KeyboardButton ('День')
-	item2 = KeyboardButton ('Неделя')
-	item3 = KeyboardButton ('Две недели')
-	item4 = KeyboardButton ('Месяц')
+	item1 = KeyboardButton (const.day)
+	item2 = KeyboardButton (const.week)
+	item3 = KeyboardButton (const.2weeks)
+	item4 = KeyboardButton (const.month)
 	item5 = KeyboardButton ('Все время')
 	item6 = KeyboardButton ('❌ Отмена')
 	allOrders.add(item1, item2, item3, item4, item5, item6)
