@@ -7,7 +7,7 @@ from aiogram.types.message import ContentTypes
 import markups as nav
 from db import Database
 from const import Const
-import error_handler
+# import error_handler
 
 # from yookassa import Payment
 import requests
