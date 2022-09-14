@@ -7,6 +7,8 @@ from aiogram.types.message import ContentTypes
 import markups as nav
 from db import Database
 from const import Const
+import error_handler
+
 # from yookassa import Payment
 import requests
 # import pandas as pd
@@ -128,7 +130,7 @@ class handler(BaseHTTPRequestHandler):
                 print(order_inform)
                 # remove inline buttons
                 # print("db.get_message_id(order_id)", db.get_message_id(order_id))
-                bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
+                await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
                 # await bot.send_message(message.from_user.id, "Платеж принят!")
                 # await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
             # Уведомление об успешном платеже за Доставку 
@@ -146,8 +148,8 @@ class handler(BaseHTTPRequestHandler):
 httpd = HTTPServer(('', 443), handler)
 httpd.socket = ssl.wrap_socket(
     httpd.socket, 
-    certfile='/etc/letsencrypt/live/lobanova.ml/fullchain.pem', 
-    keyfile = '/etc/letsencrypt/live/lobanova.ml/privkey.key',  
+    certfile='/etc/letsencrypt/live/lobanova.net/fullchain.pem', 
+    keyfile = '/etc/letsencrypt/live/lobanova.net/privkey.key',  
     ssl_version=ssl.PROTOCOL_TLS,
     server_side=True)
 
@@ -163,7 +165,7 @@ def payment(value, description):
     },
     "confirmation": {
         "type": "redirect",
-        "return_url": "www.lobanova.ml"
+        "return_url": "www.lobanova.net"
     },
     "capture": True,
     "description": description
