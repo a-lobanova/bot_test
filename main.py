@@ -149,7 +149,7 @@ httpd = HTTPServer(('', 443), handler)
 httpd.socket = ssl.wrap_socket(
     httpd.socket, 
     certfile='/etc/letsencrypt/live/lobanova.net/fullchain.pem', 
-    keyfile = '/etc/letsencrypt/live/lobanova.net/privkey.key',  
+    keyfile = '/etc/letsencrypt/live/lobanova.net/privkey.pem',  
     ssl_version=ssl.PROTOCOL_TLS,
     server_side=True)
 
