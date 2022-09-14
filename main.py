@@ -1,5 +1,7 @@
 import logging
 import telebot
+
+import asyncio
 import re
 import yookassa
 from aiogram import Bot, Dispatcher, executor, types
