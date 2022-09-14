@@ -130,7 +130,7 @@ class handler(BaseHTTPRequestHandler):
                 print(order_inform)
                 # remove inline buttons
                 # print("db.get_message_id(order_id)", db.get_message_id(order_id))
-                await bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
+                bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
                 # await bot.send_message(message.from_user.id, "Платеж принят!")
                 # await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
             # Уведомление об успешном платеже за Доставку 
