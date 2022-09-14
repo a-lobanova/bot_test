@@ -125,14 +125,15 @@ class handler(BaseHTTPRequestHandler):
         if status == "payment.succeeded":
             # Уведомление об успешном платеже за заказ 
             if db.get_orderStatus(order_id) == "wait payment":
-                db.set_orderStatus(order_id, "complitedPayment")
+                # db.set_orderStatus(order_id, "complitedPayment")
                 db.set_update(order_id) 
                 user_id = db.get_user_id_through_order_id(order_id)
                 order_inform = "Заказ оплачен через ЮКасса!\n" + "Пользователь: " + db.get_nickname(user_id) + db.get_paid_order_through_order_id(order_id) 
                 print(order_inform)
                 # remove inline buttons
                 # print("db.get_message_id(order_id)", db.get_message_id(order_id))
-                bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), text = "Получена оплата за заказ #" + order_id)
+                asynco.run(bot.edit_message_text(chat_id=adminId, message_id=db.get_message_id(order_id), 
+                    text = "Получена оплата за заказ #" + order_id))
                 # await bot.send_message(message.from_user.id, "Платеж принят!")
                 # await bot.send_message(adminId, order_inform, reply_markup=nav.orderRedeemedMurkup(order_id))
             # Уведомление об успешном платеже за Доставку 
