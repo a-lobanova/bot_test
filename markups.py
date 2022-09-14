@@ -4,7 +4,7 @@ from const import Const
 const = Const
 
 btnProfile = KeyboardButton (const.myOrders)
-btnOrder = KeyboardButton (const.myOrders)
+btnOrder = KeyboardButton (const.createOrder)
 bthAllOrders = KeyboardButton (const.allOrders)
 
 btnGetContact = KeyboardButton('Отправить свой номер', request_contact = True)
