@@ -232,7 +232,7 @@ async def bot_message(message: types.Message):
                     await message.reply("Записей не обнаружено!")
                 await bot.send_message(userId, user_nickname)
 
-            elif message.text == const.myOrders:
+            elif message.text == const.createOrder:
                 await bot.send_message(userId, "Введите заказ: бренд, наименование, размер, цвет, количество")
                 db.set_signup(userId, "set_order")
             else:

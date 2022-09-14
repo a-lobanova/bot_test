@@ -10,7 +10,7 @@ class Const:
 	# buttons name const
 
 	myOrders = "Профиль/Мои заказы"
-	craateOrder = "Создать заказ"
+	createOrder = "Создать заказ"
 	allOrders = "Все заказы"
 
 	# order status const 
